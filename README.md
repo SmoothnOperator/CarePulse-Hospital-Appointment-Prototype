@@ -1,5 +1,7 @@
 # CarePulse — Hospital Booking Appointment Prototype
 
+> 🌐 **Live Interactive Demo:** [https://smoothnoperator.github.io/CarePulse-Hospital-Appointment-Prototype/](https://smoothnoperator.github.io/CarePulse-Hospital-Appointment-Prototype/)
+
 An interactive, 3D-powered Hospital Appointment Booking Prototype developed with **Design Thinking principles**, **React 19**, **Three.js**, and **Node.js (Express)**.
 
 ---
