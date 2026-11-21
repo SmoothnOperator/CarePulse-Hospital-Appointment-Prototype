@@ -139,7 +139,7 @@ assert(
   'Emergency SOS modal features live GPS countdown and Web Audio siren generator'
 );
 
-// 8. Verify FEATURE 2: AI Voice Booking Assistant & Bilingual Localization
+// 8. Verify FEATURE 2: AI Voice Booking Assistant & Trilingual Localization (EN, HI, KN)
 assert(
   voiceAssistant.includes('SpeechRecognition') &&
   voiceAssistant.includes('parseAndMatchQuery') &&
@@ -147,16 +147,29 @@ assert(
   'AI Voice Assistant implements speech recognition, query parser, and voice output'
 );
 assert(
+  voiceAssistant.includes('kn-IN') &&
+  voiceAssistant.includes('hi-IN') &&
+  voiceAssistant.includes('en-US'),
+  'Voice Assistant supports kn-IN (Kannada), hi-IN (Hindi), and en-US (English)'
+);
+assert(
+  voiceAssistant.includes('ಮಕ್ಕ') &&
+  voiceAssistant.includes('ಮೂಳೆ') &&
+  voiceAssistant.includes('ಮೆದುಳು'),
+  'Voice Assistant parses authentic Kannada symptoms (Pediatrics, Ortho, Neuro)'
+);
+assert(
   translations.includes('en:') &&
   translations.includes('hi:') &&
-  translations.includes('केयरपल्स'),
-  'Bilingual translation dictionary covers English and Hindi'
+  translations.includes('kn:') &&
+  translations.includes('ಕೇರ್‌ಪಲ್ಸ್'),
+  'Trilingual translation dictionary covers English, Hindi, and authentic Kannada'
 );
 assert(
   appJsx.includes('EmergencySosModal') &&
   appJsx.includes('VoiceBookingAssistant') &&
-  appJsx.includes('toggleLanguage'),
-  'React App orchestrates Emergency SOS, Voice Assistant, and Language Toggle'
+  (appJsx.includes('dt-lang-segment') || appJsx.includes('setLang')),
+  'React App orchestrates Emergency SOS, Voice Assistant, and Trilingual Selector'
 );
 
 // 9. Verify Node.js Backend API

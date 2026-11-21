@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * VoiceBookingAssistant
- * Speech-to-text voice assistant with real-time audio visualization,
- * natural language symptom-to-doctor slot parser, and speech synthesis response.
+ * Trilingual Voice AI Assistant (English, Hindi, Kannada)
+ * Real-time SpeechRecognition (en-US, hi-IN, kn-IN), natural language triage parser,
+ * Kannada & Hindi SpeechSynthesis output, and sample prompt chips.
  */
 export default function VoiceBookingAssistant({
   isOpen,
@@ -12,35 +13,60 @@ export default function VoiceBookingAssistant({
   t,
   onVoiceMatch
 }) {
+  const [activeVoiceLang, setActiveVoiceLang] = useState(lang === 'kn' ? 'kn' : lang === 'hi' ? 'hi' : 'en');
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [feedback, setFeedback] = useState('');
   const recognitionRef = useRef(null);
 
-  // Initialize SpeechRecognition if available
+  // Sync active voice language with parent lang if changed
+  useEffect(() => {
+    setActiveVoiceLang(lang === 'kn' ? 'kn' : lang === 'hi' ? 'hi' : 'en');
+  }, [lang]);
+
+  // Map language to speech recognition code
+  const getRecognitionLangCode = (lng) => {
+    if (lng === 'kn') return 'kn-IN';
+    if (lng === 'hi') return 'hi-IN';
+    return 'en-US';
+  };
+
+  // Initialize SpeechRecognition
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
+      recognition.lang = getRecognitionLangCode(activeVoiceLang);
 
       recognition.onstart = () => {
         setIsListening(true);
-        setFeedback(t.listeningText);
+        setFeedback(
+          activeVoiceLang === 'kn'
+            ? 'ಕೇಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ... ಮಾತನಾಡಿ'
+            : activeVoiceLang === 'hi'
+            ? 'सुन रहे हैं... कृपया बोलें'
+            : 'Listening... speak now'
+        );
       };
 
       recognition.onresult = (event) => {
         const spokenText = event.results[0][0].transcript;
         setTranscript(spokenText);
-        parseAndMatchQuery(spokenText);
+        parseAndMatchQuery(spokenText, activeVoiceLang);
       };
 
       recognition.onerror = (e) => {
         console.warn('Speech recognition error:', e.error);
         setIsListening(false);
-        setFeedback('Could not capture audio. Please select a sample prompt below.');
+        setFeedback(
+          activeVoiceLang === 'kn'
+            ? 'ಧ್ವನಿ ಗ್ರಹಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಕೆಳಗಿನ ವಾಕ್ಯಗಳಲ್ಲಿ ಒಂದನ್ನು ಆರಿಸಿ.'
+            : activeVoiceLang === 'hi'
+            ? 'आवाज नहीं सुनी जा सकी। कृपया नीचे दिए गए उदाहरण पर क्लिक करें।'
+            : 'Could not capture audio. Please select a sample prompt below.'
+        );
       };
 
       recognition.onend = () => {
@@ -49,7 +75,7 @@ export default function VoiceBookingAssistant({
 
       recognitionRef.current = recognition;
     }
-  }, [lang, t]);
+  }, [activeVoiceLang]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
@@ -61,9 +87,8 @@ export default function VoiceBookingAssistant({
       setIsListening(false);
     } else {
       setTranscript('');
-      setFeedback(t.listeningText);
       try {
-        recognitionRef.current.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
+        recognitionRef.current.lang = getRecognitionLangCode(activeVoiceLang);
         recognitionRef.current.start();
       } catch (err) {
         console.warn('Recognition start error:', err);
@@ -71,79 +96,156 @@ export default function VoiceBookingAssistant({
     }
   };
 
-  // Speak audio feedback using SpeechSynthesis
-  const speakResponse = (text) => {
+  // Speak audio response in English, Hindi, or Kannada
+  const speakResponse = (text, lng) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
+      utterance.lang = getRecognitionLangCode(lng);
       utterance.rate = 1.0;
       window.speechSynthesis.speak(utterance);
     }
   };
 
-  // Parse natural language queries into doctors and slots
-  const parseAndMatchQuery = (query) => {
+  // Natural language query parser supporting English, Hindi, and Kannada
+  const parseAndMatchQuery = (query, currentLng) => {
     const q = query.toLowerCase();
     let matchedDocId = 'doc-1';
     let matchedSlot = { id: 's1', time: '10:30 AM', status: 'fast', label: 'Next Available' };
     let confirmationVoice = '';
 
-    if (q.includes('child') || q.includes('pedia') || q.includes('rajesh') || q.includes('बच्च') || q.includes('शिशु')) {
+    // Pediatrics (ಮಕ್ಕಳು, ಶಿಶು, बच्चे, child, pedia, rajesh)
+    if (
+      q.includes('ಮಕ್ಕ') ||
+      q.includes('ಶಿಶು') ||
+      q.includes('ಮಗು') ||
+      q.includes('child') ||
+      q.includes('pedia') ||
+      q.includes('rajesh') ||
+      q.includes('बच्च')
+    ) {
       matchedDocId = 'doc-2';
       matchedSlot = { id: 's7', time: '11:00 AM', status: 'fast', label: 'Next Available' };
-      confirmationVoice = lang === 'hi'
-        ? 'बाल रोग विशेषज्ञ डॉ. राजेश वर्मा के साथ सुबह 11 बजे का स्लॉट चुना गया है।'
-        : 'Matched Pediatrics with Dr. Rajesh Varma for 11:00 AM today.';
-    } else if (q.includes('ortho') || q.includes('bone') || q.includes('joint') || q.includes('knee') || q.includes('हड्डी') || q.includes('जोड़')) {
+      if (currentLng === 'kn') {
+        confirmationVoice = 'ಮಕ್ಕಳ ತಜ್ಞ ಡಾ. ರಾಜೇಶ್ ವರ್ಮಾ ಅವರೊಂದಿಗೆ ಬೆಳಗ್ಗೆ 11:00 ಗಂಟೆಯ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ.';
+      } else if (currentLng === 'hi') {
+        confirmationVoice = 'बाल रोग विशेषज्ञ डॉ. राजेश वर्मा के साथ सुबह 11 बजे का स्लॉट चुना गया है।';
+      } else {
+        confirmationVoice = 'Matched Pediatrics with Dr. Rajesh Varma for 11:00 AM today.';
+      }
+    }
+    // Orthopedics (ಮೂಳೆ, ಕೀಲು, ಕಾಲು, हड्डी, जोड़, ortho, bone, joint, knee)
+    else if (
+      q.includes('ಮೂಳೆ') ||
+      q.includes('ಕೀಲು') ||
+      q.includes('ಕಾಲು') ||
+      q.includes('ಹಿಂದಿ') ||
+      q.includes('हड्डी') ||
+      q.includes('जोड़') ||
+      q.includes('ortho') ||
+      q.includes('bone') ||
+      q.includes('joint') ||
+      q.includes('knee') ||
+      q.includes('meera')
+    ) {
       matchedDocId = 'doc-3';
       matchedSlot = { id: 's11', time: '01:00 PM', status: 'fast', label: 'Next Available' };
-      confirmationVoice = lang === 'hi'
-        ? 'हड्डी विशेषज्ञ डॉ. मीरा कुलकर्णी के साथ दोपहर 1 बजे का स्लॉट चुना गया है।'
-        : 'Matched Orthopedics with Dr. Meera Kulkarni for 1:00 PM today.';
-    } else if (q.includes('neuro') || q.includes('brain') || q.includes('headache') || q.includes('मस्तिष्क') || q.includes('सिर')) {
+      if (currentLng === 'kn') {
+        confirmationVoice = 'ಮೂಳೆ ಮತ್ತು ಕೀಲು ತಜ್ಞೆ ಡಾ. ಮೀರಾ ಕುಲಕರ್ಣಿ ಅವರೊಂದಿಗೆ ಮಧ್ಯಾಹ್ನ 1:00 ಗಂಟೆಯ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ.';
+      } else if (currentLng === 'hi') {
+        confirmationVoice = 'हड्डी विशेषज्ञ डॉ. मीरा कुलकर्णी के साथ दोपहर 1 बजे का स्लॉट चुना गया है।';
+      } else {
+        confirmationVoice = 'Matched Orthopedics with Dr. Meera Kulkarni for 1:00 PM today.';
+      }
+    }
+    // Neurology (ಮೆದುಳು, ತಲೆನೋವು, ನರ, मस्तिष्क, सिर, neuro, brain, headache)
+    else if (
+      q.includes('ಮೆದುಳು') ||
+      q.includes('ತಲೆನೋವು') ||
+      q.includes('ನರ') ||
+      q.includes('मस्तिष्क') ||
+      q.includes('सिर') ||
+      q.includes('neuro') ||
+      q.includes('brain') ||
+      q.includes('headache') ||
+      q.includes('rohan')
+    ) {
       matchedDocId = 'doc-4';
       matchedSlot = { id: 's15', time: '11:30 AM', status: 'fast', label: 'Next Available' };
-      confirmationVoice = lang === 'hi'
-        ? 'न्यूरो विशेषज्ञ डॉ. रोहन देशमुख के साथ सुबह 11:30 बजे का स्लॉट चुना गया है।'
-        : 'Matched Neurology with Dr. Rohan Deshmukh for 11:30 AM today.';
-    } else if (q.includes('skin') || q.includes('allergy') || q.includes('rash') || q.includes('त्वचा') || q.includes('एलर्जी')) {
+      if (currentLng === 'kn') {
+        confirmationVoice = 'ನರರೋಗ ತಜ್ಞ ಡಾ. ರೋಹನ್ ದೇಶಮುಖ್ ಅವರೊಂದಿಗೆ ಬೆಳಗ್ಗೆ 11:30 ರ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ.';
+      } else if (currentLng === 'hi') {
+        confirmationVoice = 'न्यूरो विशेषज्ञ डॉ. रोहन देशमुख के साथ सुबह 11:30 बजे का स्लॉट चुना गया है।';
+      } else {
+        confirmationVoice = 'Matched Neurology with Dr. Rohan Deshmukh for 11:30 AM today.';
+      }
+    }
+    // Dermatology (ಚರ್ಮ, ತುರಿಕೆ, त्वचा, एलर्जी, skin, allergy, rash, priya)
+    else if (
+      q.includes('ಚರ್ಮ') ||
+      q.includes('ತುರಿಕೆ') ||
+      q.includes('ಅಲರ್ಜಿ') ||
+      q.includes('त्वचा') ||
+      q.includes('एलर्जी') ||
+      q.includes('skin') ||
+      q.includes('allergy') ||
+      q.includes('rash') ||
+      q.includes('priya')
+    ) {
       matchedDocId = 'doc-5';
       matchedSlot = { id: 's18', time: '10:00 AM', status: 'fast', label: 'Next Available' };
-      confirmationVoice = lang === 'hi'
-        ? 'त्वचा रोग विशेषज्ञ डॉ. प्रिया नंबियार के साथ सुबह 10 बजे का स्लॉट चुना गया है।'
-        : 'Matched Dermatology with Dr. Priya Nambiar for 10:00 AM today.';
-    } else {
-      // Default to Cardiology (Dr. Sharma)
+      if (currentLng === 'kn') {
+        confirmationVoice = 'ಚರ್ಮ ರೋಗ ತಜ್ಞೆ ಡಾ. ಪ್ರಿಯಾ ನಂಬಿಯಾರ್ ಅವರೊಂದಿಗೆ ಬೆಳಗ್ಗೆ 10:00 ಗಂಟೆಯ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ.';
+      } else if (currentLng === 'hi') {
+        confirmationVoice = 'त्वचा रोग विशेषज्ञ डॉ. प्रिया नंबियार के साथ सुबह 10 बजे का स्लॉट चुना गया है।';
+      } else {
+        confirmationVoice = 'Matched Dermatology with Dr. Priya Nambiar for 10:00 AM today.';
+      }
+    }
+    // Default to Cardiology (Dr. Ananya Sharma)
+    else {
       matchedDocId = 'doc-1';
       matchedSlot = { id: 's1', time: '10:30 AM', status: 'fast', label: 'Next Available' };
-      confirmationVoice = lang === 'hi'
-        ? 'हृदय रोग विशेषज्ञ डॉ. अनन्या शर्मा के साथ 10:30 बजे का स्लॉट चुना गया है।'
-        : 'Matched Cardiology with Dr. Ananya Sharma for 10:30 AM today.';
+      if (currentLng === 'kn') {
+        confirmationVoice = 'ಹೃದಯ ತಜ್ಞೆ ಡಾ. ಅನನ್ಯಾ ಶರ್ಮಾ ಅವರೊಂದಿಗೆ ಬೆಳಗ್ಗೆ 10:30 ರ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ.';
+      } else if (currentLng === 'hi') {
+        confirmationVoice = 'हृदय रोग विशेषज्ञ डॉ. अनन्या शर्मा के साथ 10:30 बजे का स्लॉट चुना गया है।';
+      } else {
+        confirmationVoice = 'Matched Cardiology with Dr. Ananya Sharma for 10:30 AM today.';
+      }
     }
 
     setFeedback(confirmationVoice);
-    speakResponse(confirmationVoice);
+    speakResponse(confirmationVoice, currentLng);
 
     setTimeout(() => {
       onVoiceMatch(matchedDocId, matchedSlot);
       onClose();
-    }, 1200);
+    }, 1300);
   };
 
-  const samplePrompts = lang === 'hi'
-    ? [
-        'सीने में दर्द है, हृदय रोग डॉक्टर चाहिए',
-        'बच्चे को बुखार है, पीडियाट्रिशियन बुक करें',
-        'घुटने में दर्द है, ऑर्थोपेडिक स्लॉट चाहिए',
-        'स्किन एलर्जी के डॉक्टर से मिलना है'
-      ]
-    : [
-        'Book Cardiology slot with Dr. Sharma for chest pain',
-        'Need child pediatrician Dr. Rajesh Varma',
-        'Book knee and joint specialist slot',
-        'Skin allergy doctor available today'
-      ];
+  // Sample prompt chips by language
+  const samplePrompts =
+    activeVoiceLang === 'kn'
+      ? [
+          'ಎದೆ ನೋವಿದೆ, ಹೃದಯ ತಜ್ಞರ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬೇಕು',
+          'ಮಗುವಿಗೆ ಜ್ವರವಿದೆ, ಮಕ್ಕಳ ವೈದ್ಯರನ್ನು ಬುಕ್ ಮಾಡಿ',
+          'ಕೀಲು ಮತ್ತು ಮೂಳೆ ನೋವಿನ ತಜ್ಞರನ್ನು ಭೇಟಿ ಮಾಡಬೇಕು',
+          'ಚರ್ಮ ರೋಗ ಮತ್ತು ಅಲರ್ಜಿ ವೈದ್ಯರ ಸ್ಲಾಟ್'
+        ]
+      : activeVoiceLang === 'hi'
+      ? [
+          'सीने में दर्द है, हृदय रोग डॉक्टर चाहिए',
+          'बच्चे को बुखार है, पीडियाट्रिशियन बुक करें',
+          'घुटने में दर्द है, ऑर्थोपेडिक स्लॉट चाहिए',
+          'स्किन एलर्जी के डॉक्टर से मिलना है'
+        ]
+      : [
+          'Book Cardiology slot with Dr. Sharma for chest pain',
+          'Need child pediatrician Dr. Rajesh Varma',
+          'Book knee and joint specialist slot',
+          'Skin allergy doctor available today'
+        ];
 
   if (!isOpen) return null;
 
@@ -155,10 +257,35 @@ export default function VoiceBookingAssistant({
         <div className="voice-modal-header">
           <div className="voice-badge">
             <span className="pulse-mic-dot"></span>
-            <span>AI Voice Triage</span>
+            <span>AI Voice Triage • 3 Languages</span>
           </div>
           <h3 className="voice-title">{t.voiceModalTitle}</h3>
           <p className="voice-subtitle">{t.voiceModalDesc}</p>
+        </div>
+
+        {/* Voice Language Selector Tabs (English, Hindi, Kannada) */}
+        <div className="voice-lang-tabs">
+          <button
+            type="button"
+            className={`voice-lang-tab ${activeVoiceLang === 'en' ? 'active' : ''}`}
+            onClick={() => setActiveVoiceLang('en')}
+          >
+            English (en-US)
+          </button>
+          <button
+            type="button"
+            className={`voice-lang-tab ${activeVoiceLang === 'hi' ? 'active' : ''}`}
+            onClick={() => setActiveVoiceLang('hi')}
+          >
+            हिन्दी (hi-IN)
+          </button>
+          <button
+            type="button"
+            className={`voice-lang-tab ${activeVoiceLang === 'kn' ? 'active' : ''}`}
+            onClick={() => setActiveVoiceLang('kn')}
+          >
+            ಕನ್ನಡ (kn-IN)
+          </button>
         </div>
 
         {/* Audio Wave Visualizer & Mic Button */}
@@ -198,7 +325,7 @@ export default function VoiceBookingAssistant({
                 className="voice-prompt-chip"
                 onClick={() => {
                   setTranscript(prompt);
-                  parseAndMatchQuery(prompt);
+                  parseAndMatchQuery(prompt, activeVoiceLang);
                 }}
               >
                 <span>&quot;{prompt}&quot;</span>

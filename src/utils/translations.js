@@ -1,6 +1,6 @@
 /**
- * CarePulse Hospital Prototype - Bilingual Localization Dictionary
- * Languages: English ('en') and Hindi ('hi')
+ * CarePulse Hospital Prototype - Trilingual Localization Dictionary
+ * Supported Languages: English ('en'), Hindi ('hi'), Kannada ('kn')
  */
 
 export const translations = {
@@ -17,7 +17,7 @@ export const translations = {
     campus3dOn: "🌐 3D Campus: ON",
     campus3dOff: "🌐 3D Campus: OFF",
     viewDtCanvas: "📋 View Design Thinking Canvas",
-    langToggle: "हिन्दी",
+    langName: "English",
 
     // Hero
     heroPill: "⚡ 3D Interactive Fast-Track OPD Appointments",
@@ -71,7 +71,7 @@ export const translations = {
 
     // Voice Assistant
     voiceModalTitle: "CarePulse AI Voice Booking Assistant",
-    voiceModalDesc: "Speak naturally in English or Hindi to find doctors and book instantly.",
+    voiceModalDesc: "Speak naturally in English, Hindi, or Kannada to find doctors and book instantly.",
     listeningText: "Listening... speak now",
     startListening: "Start Speaking",
     stopListening: "Stop",
@@ -110,7 +110,7 @@ export const translations = {
     campus3dOn: "🌐 3D कैंपस: चालू",
     campus3dOff: "🌐 3D कैंपस: बंद",
     viewDtCanvas: "📋 डिजाइन थिंकिंग कैनवास देखें",
-    langToggle: "English",
+    langName: "हिन्दी",
 
     // Hero
     heroPill: "⚡ 3D इंटरैक्टिव फास्ट-ट्रैक ओपीडी अपॉइंटमेंट",
@@ -164,7 +164,7 @@ export const translations = {
 
     // Voice Assistant
     voiceModalTitle: "केयरपल्स एआई वॉयस बुकिंग असिस्टेंट",
-    voiceModalDesc: "हिंदी या अंग्रेजी में बोलकर तुरंत डॉक्टर खोजें और बुक करें।",
+    voiceModalDesc: "हिंदी, कन्नड़ या अंग्रेजी में बोलकर तुरंत डॉक्टर खोजें और बुक करें।",
     listeningText: "सुन रहे हैं... कृपया बोलें",
     startListening: "बोलना शुरू करें",
     stopListening: "रोकें",
@@ -188,5 +188,98 @@ export const translations = {
     bookAnother: "दूसरा अपॉइंटमेंट बुक करें",
     viewDtAnalysis: "डिजाइन थिंकिंग विश्लेषण देखें",
     simulatedSmsTitle: "📱 मरीज को भेजा गया सिम्युलेटेड एसएमएस:"
+  },
+
+  kn: {
+    // Header & Brand
+    brandTitle: "ಕೇರ್‌ಪಲ್ಸ್",
+    brandSubtitle: "ಮೆಮೋರಿಯಲ್ ಸೂಪರ್ ಸ್ಪೆಷಾಲಿಟಿ ಆಸ್ಪತ್ರೆ",
+    navFindDoctor: "ವೈದ್ಯರನ್ನು ಹುಡುಕಿ",
+    navLiveQueue: "ಲೈವ್ ಒಪಿಡಿ ಕ್ಯೂ",
+    navEmergency: "ತುರ್ತು ಸೇವೆ: 108 / (080) 4422-9900",
+    dtSprint: "ಡಿಸೈನ್ ಥಿಂಕಿಂಗ್ ಸ್ಪ್ರಿಂಟ್",
+    dt3dProto: "3D ಇಂಟರಾಕ್ಟಿವ್ ಪ್ರೊಟೊಟೈಪ್",
+    showAnnotations: "ಡಿಟಿ ಟಿಪ್ಪಣಿಗಳನ್ನು ತೋರಿಸಿ (ವೃತ್ತಾಕಾರ ಮತ್ತು ಗುರುತು)",
+    campus3dOn: "🌐 3D ಕ್ಯಾಂಪಸ್: ಆನ್",
+    campus3dOff: "🌐 3D ಕ್ಯಾಂಪಸ್: ಆಫ್",
+    viewDtCanvas: "📋 ಡಿಸೈನ್ ಥಿಂಕಿಂಗ್ ಕ್ಯಾನ್ವಾಸ್ ವೀಕ್ಷಿಸಿ",
+    langName: "ಕನ್ನಡ",
+
+    // Hero
+    heroPill: "⚡ 3D ಇಂಟರಾಕ್ಟಿವ್ ಫಾಸ್ಟ್-ಟ್ರಾಕ್ ಒಪಿಡಿ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್",
+    heroTitle: "30 ಸೆಕೆಂಡುಗಳಲ್ಲಿ ವೈದ್ಯರ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಕಾಯ್ದಿರಿಸಿ",
+    heroSubtitle: "20 ನಿಮಿಷಗಳ ಫೋನ್ ಕಾಯುವಿಕೆ ಇಲ್ಲ, 5 ಪುಟಗಳ ನಮೂನೆ ಇಲ್ಲ. ನಿಮ್ಮ ರೋಗಲಕ್ಷಣವನ್ನು ಆರಿಸಿ, ಧ್ವನಿಯ ಮೂಲಕ ಬುಕ್ ಮಾಡಿ ಅಥವಾ ಸ್ಲಾಟ್ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    searchPlaceholder: "ವೈದ್ಯರು, ರೋಗಲಕ್ಷಣಗಳನ್ನು ಹುಡುಕಿ (ಉದಾ: ಎದೆ ನೋವು, ಕೀಲು ನೋವು, ಜ್ವರ) ಅಥವಾ ಮೈಕ್ ಒತ್ತಿರಿ...",
+    voiceSearchTitle: "ಧ್ವನಿ ಸಹಾಯಕ",
+    quickTriage: "ತ್ವರಿತ ವಿಭಾಗಗಳು:",
+
+    // Specialties
+    allSpecialties: "ಎಲ್ಲಾ ವಿಭಾಗಗಳು",
+    cardiology: "❤️ ಹೃದಯ / ಎದೆ ನೋವು",
+    orthopedics: "🦴 ಮೂಳೆ / ಕೀಲು ನೋವು",
+    pediatrics: "👶 ಮಕ್ಕಳ ತಜ್ಞರು (ಶಿಶು)",
+    neurology: "🧠 ನರರೋಗ ತಜ್ಞರು (ಮೆದುಳು)",
+    dermatology: "🌿 ಚರ್ಮ / ಅಲರ್ಜಿ",
+
+    // OPD & Doctor Cards
+    availableDoctors: "ಲಭ್ಯವಿರುವ ಪರಿಣಿತ ವೈದ್ಯರು ಮತ್ತು ಇಂದಿನ ಸ್ಲಾಟ್‌ಗಳು",
+    availableSlotsDesc: "ಇಂದಿನ ಲೈವ್ ಕ್ಯೂ ಕಾಯುವಿಕೆಯೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿದ ಸ್ಲಾಟ್‌ಗಳು",
+    showingSpecialists: "{count} ಪರಿಣಿತ ವೈದ್ಯರು ಲಭ್ಯವಿದ್ದಾರೆ",
+    liveOpdQueue: "ಲೈವ್ ಒಪಿಡಿ ಕ್ಯೂ:",
+    patientsAhead: "{cabin} ನಲ್ಲಿ ನಿಮಗಿಂತ ಮುಂಚಿತವಾಗಿ {count} ರೋಗಿಗಳು",
+    avgWait: "⚡ ಸರಾಸರಿ ಕಾಯುವಿಕೆ: ~{wait} ನಿಮಿಷಗಳು",
+    selectSlotLabel: "ಸಮಾಲೋಚನೆಗಾಗಿ ಸಮಯದ ಸ್ಲಾಟ್ ಆಯ್ಕೆಮಾಡಿ:",
+    guaranteedSeat: "✓ ಖಚಿತ ವೈದ್ಯರ ಸೀಟು",
+    nextAvailable: "ಮೊದಲು ಲಭ್ಯವಿದೆ",
+    available: "ಲಭ್ಯವಿದೆ",
+    onlyOneLeft: "1 ಮಾತ್ರ ಉಳಿದಿದೆ",
+    booked: "ಬುಕ್ ಆಗಿದೆ",
+    lockAppointment: "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಲಾಕ್ ಮಾಡಿ",
+    tapSlotPrompt: "ತಕ್ಷಣ ಕಾಯ್ದಿರಿಸಲು ಮೇಲಿನ ಯಾವುದೇ ಸ್ಲಾಟ್ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ",
+    selectedSlotFeedback: "ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ: {time} - {doc} ({cabin})",
+
+    // Core Function
+    coreFunctionTitle: "ಮುಖ್ಯ ಕಾರ್ಯ (ವೃತ್ತಾಕಾರ ಮತ್ತು ಗುರುತು)",
+    coreFunctionDesc: "1-ಕ್ಲಿಕ್ ತಕ್ಷಣದ ಸ್ಲಾಟ್ ಲಾಕ್ ಮತ್ತು ಲೈವ್ ಒಪಿಡಿ ಕ್ಯೂ: 15 ನಿಮಿಷಗಳ ಫೋನ್ ಕರೆ ಮತ್ತು ದೀರ್ಘ ನಮೂನೆಯ ಕಷ್ಟವನ್ನು ನಿವಾರಿಸುತ್ತದೆ.",
+    touchpointSlotBadge: "👉 ಟಚ್‌ಪಾಯಿಂಟ್ B: ಇಂಟರಾಕ್ಟಿವ್ ಟಚ್-ಚಿಪ್ಸ್ (≥52px ಗುರಿಗಳು)",
+
+    // Emergency SOS
+    emergencySosBtn: "🚨 ತುರ್ತು SOS",
+    emergencySosTitle: "ತುರ್ತು ಟ್ರಾಮಾ ಮತ್ತು ಆಂಬ್ಯುಲೆನ್ಸ್ ರವಾನೆ",
+    emergencySosSubtitle: "ತಕ್ಷಣದ ಆದ್ಯತೆ ಪ್ರತಿಕ್ರಿಯೆ • 24/7 ತುರ್ತು ಕಮಾಂಡ್ ಕೇಂದ್ರ",
+    unitDispatched: "ALS ಆಂಬ್ಯುಲೆನ್ಸ್ #04 ರವಾನಿಸಲಾಗಿದೆ",
+    liveEta: "ಲೈವ್ ಜಿಪಿಎಸ್ ತಲುಪುವ ಸಮಯ:",
+    corridorStatus: "ಗ್ರೀನ್ ಕಾರಿಡಾರ್: ಸಕ್ರಿಯ ಮತ್ತು ಮುಕ್ತವಾಗಿದೆ",
+    traumaBay: "ಟ್ರಾಮಾ ಬೇ #01 ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ",
+    call108: "108 ಗೆ ನೇರ ಕರೆ ಮಾಡಿ",
+    callErDesk: "ಆಸ್ಪತ್ರೆ ER ಡೆಸ್ಕ್‌ಗೆ ಕರೆ",
+    sirenSound: "ಸೈರನ್ ಧ್ವನಿ",
+
+    // Voice Assistant
+    voiceModalTitle: "ಕೇರ್‌ಪಲ್ಸ್ AI ಧ್ವನಿ ಬುಕಿಂಗ್ ಸಹಾಯಕ",
+    voiceModalDesc: "ಕನ್ನಡ, ಹಿಂದಿ ಅಥವಾ ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ ತಕ್ಷಣ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಕಾಯ್ದಿರಿಸಿ.",
+    listeningText: "ಕೇಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ... ಮಾತನಾಡಿ",
+    startListening: "ಮಾತನಾಡಲು ಪ್ರಾರಂಭಿಸಿ",
+    stopListening: "ನಿಲ್ಲಿಸಿ",
+    trySaying: "ಇವುಗಳಲ್ಲಿ ಒಂದನ್ನು ಹೇಳಿ ನೋಡಿ:",
+    voiceSuccessMatched: "ಸ್ಲಾಟ್ ಸಿಕ್ಕಿದೆ: {time} - {doc}!",
+
+    // Booking Modal
+    confirmOpdBooking: "ಒಪಿಡಿ ಬುಕಿಂಗ್ ಖಚಿತಪಡಿಸಿ",
+    lockSlotTitle: "ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಸ್ಲಾಟ್ ಲಾಕ್ ಮಾಡಿ",
+    noPrepayNote: "ಮುಂಗಡ ಪಾವತಿ ಅಗತ್ಯವಿಲ್ಲ. ಸಮಾಲೋಚನೆಯ ನಂತರ ಆಸ್ಪತ್ರೆಯಲ್ಲಿ ಪಾವತಿಸಿ.",
+    patientName: "ರೋಗಿಯ ಪೂರ್ಣ ಹೆಸರು",
+    mobileNumber: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ (SMS ಮತ್ತು ಟೋಕನ್‌ಗಾಗಿ)",
+    age: "ವಯಸ್ಸು",
+    reason: "ಮುಖ್ಯ ರೋಗಲಕ್ಷಣ / ಕಾರಣ (ಐಚ್ಛಿಕ)",
+    zeroFeeNote: "ಶೂನ್ಯ ರದ್ದತಿ ಶುಲ್ಕ: ನೀವು ತಕ್ಷಣ ಡಿಜಿಟಲ್ ಟೋಕನ್ ಮತ್ತು SMS ಸ್ವೀಕರಿಸುತ್ತೀರಿ.",
+    confirmAndGenerate: "ಖಚಿತಪಡಿಸಿ ಮತ್ತು 3D ಟೋಕನ್ ರಚಿಸಿ",
+
+    // Success Modal
+    appointmentConfirmed: "ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಖಚಿತವಾಗಿದೆ!",
+    syncNote: "ವೈದ್ಯರ ಒಪಿಡಿ ಕನ್ಸೋಲ್‌ನಲ್ಲಿ ನೇರವಾಗಿ ಸಿಂಕ್ ಮಾಡಲಾಗಿದೆ.",
+    bookAnother: "ಮತ್ತೊಂದು ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ",
+    viewDtAnalysis: "ಡಿಸೈನ್ ಥಿಂಕಿಂಗ್ ವಿಶ್ಲೇಷಣೆ ವೀಕ್ಷಿಸಿ",
+    simulatedSmsTitle: "📱 ರೋಗಿಗೆ ಕಳುಹಿಸಲಾದ SMS ಮುನ್ನೋಟ:"
   }
 };

@@ -230,15 +230,33 @@ export default function App() {
           </div>
 
           <div className="dt-controls">
-            {/* Bilingual Language Switcher */}
-            <button
-              type="button"
-              className="dt-lang-toggle-btn"
-              onClick={toggleLanguage}
-              title="Switch Language / भाषा बदलें"
-            >
-              <span>🌐 {t.langToggle}</span>
-            </button>
+            {/* Trilingual Segmented Language Switcher */}
+            <div className="dt-lang-segment" role="group" aria-label="Select language">
+              <button
+                type="button"
+                className={`lang-seg-btn ${lang === 'en' ? 'active' : ''}`}
+                onClick={() => setLang('en')}
+                title="Switch to English"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={`lang-seg-btn ${lang === 'hi' ? 'active' : ''}`}
+                onClick={() => setLang('hi')}
+                title="हिन्दी में बदलें"
+              >
+                हिन्दी
+              </button>
+              <button
+                type="button"
+                className={`lang-seg-btn ${lang === 'kn' ? 'active' : ''}`}
+                onClick={() => setLang('kn')}
+                title="ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ"
+              >
+                ಕನ್ನಡ
+              </button>
+            </div>
 
             <label className="dt-toggle-label" htmlFor="reactDtAnnotationToggle">
               <span className="toggle-text">{t.showAnnotations}</span>
@@ -441,7 +459,9 @@ export default function App() {
                     <div className="status-indicator online" title={`On Duty in ${doc.cabin}`}></div>
                   </div>
                   <div className="doctor-details">
-                    <div className={`specialty-tag tag-${doc.colorTheme}`}>{doc.specialty}</div>
+                    <div className={`specialty-tag tag-${doc.colorTheme}`}>
+                      {t[doc.specialty.toLowerCase()] || doc.specialty}
+                    </div>
                     <h3 className="doctor-name">{doc.name}</h3>
                     <p className="doctor-meta">{doc.title} • {doc.experience} • {doc.languages}</p>
                     <div className="doctor-stats">

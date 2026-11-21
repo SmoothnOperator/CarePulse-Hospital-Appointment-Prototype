@@ -1782,7 +1782,42 @@ body .app-root.hide-dt-annotations .interaction-point-wrapper {
    9. NEW FEATURES: LANGUAGE TOGGLE, 3D AMBULANCE, VOICE AI
    ========================================================== */
 
-/* Language Toggle Button in Header */
+/* Trilingual Segmented Language Switcher in Header */
+.dt-lang-segment {
+  display: inline-flex;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: var(--radius-full);
+  padding: 2px;
+  gap: 2px;
+}
+
+.lang-seg-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.lang-seg-btn:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lang-seg-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.4);
+}
+
+/* Language Toggle Button in Header (Fallback) */
 .dt-lang-toggle-btn {
   background: #1e293b;
   color: #38bdf8;
@@ -2324,6 +2359,40 @@ body .app-root.hide-dt-annotations .interaction-point-wrapper {
   font-size: 0.84rem;
   color: var(--slate-500);
   margin-top: 4px;
+}
+
+/* Voice Assistant Language Tabs (English, Hindi, Kannada) */
+.voice-lang-tabs {
+  display: inline-flex;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 3px;
+  margin: 14px auto 4px;
+}
+
+.voice-lang-tab {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.voice-lang-tab:hover {
+  color: #0f172a;
+}
+
+.voice-lang-tab.active {
+  background: #0d9488;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.35);
 }
 
 /* Audio Equalizer & Mic Animation */
