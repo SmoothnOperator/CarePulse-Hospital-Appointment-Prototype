@@ -3,257 +3,416 @@ import * as THREE from 'three';
 
 /**
  * ThreeAmbulanceTracker
- * 3D WebGL Live Ambulance Dispatch & Route Simulation Scene
- * Shows high-speed road motion, 3D ambulance vehicle, flashing red/blue emergency sirens,
- * and 3D GPS route beacons.
+ * Highly-animated 3D WebGL Ambulance Rush Simulation:
+ * 1. Dynamic Lane Overtaking & Slalom Physics (chassis roll, wheel steering)
+ * 2. Civilian Traffic Cars pulling over to the shoulder
+ * 3. 360-degree Sweeping Volumetric Siren Light Beams (Red & Blue)
+ * 4. Dual Exhaust Nitro Smoke Particles
+ * 5. High-Velocity Warp Speed Streaks
+ * 6. Interactive Turbo Boost & Action Camera Modes with Live Speedometer
  */
 export default function ThreeAmbulanceTracker({ isDispatched = true, etaSeconds = 342 }) {
   const mountRef = useRef(null);
-  const [cameraView, setCameraView] = useState('chase'); // 'chase', 'top', 'front'
+  const [cameraView, setCameraView] = useState('chase'); // 'chase', 'cockpit', 'drone', 'front', 'action'
+  const [isTurbo, setIsTurbo] = useState(false);
+  const [speedKmh, setSpeedKmh] = useState(78);
+
   const cameraViewRef = useRef('chase');
+  const isTurboRef = useRef(false);
 
   useEffect(() => {
     cameraViewRef.current = cameraView;
   }, [cameraView]);
 
   useEffect(() => {
+    isTurboRef.current = isTurbo;
+  }, [isTurbo]);
+
+  useEffect(() => {
     const currentMount = mountRef.current;
     if (!currentMount) return;
 
     let width = currentMount.clientWidth || 580;
-    let height = currentMount.clientHeight || 280;
+    let height = currentMount.clientHeight || 300;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0f1d);
-    scene.fog = new THREE.FogExp2(0x0a0f1d, 0.035);
+    scene.background = new THREE.Color(0x060913);
+    scene.fog = new THREE.FogExp2(0x060913, 0.028);
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 200);
-    camera.position.set(0, 3.5, 7.5);
+    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 250);
+    camera.position.set(0, 3.2, 7.5);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     currentMount.appendChild(renderer.domElement);
 
-    // Ambient light
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    // Ambient & Moon Light
+    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
     scene.add(ambient);
 
+    const moonLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
+    moonLight.position.set(10, 20, 10);
+    scene.add(moonLight);
+
     // ==========================================
-    // 1. HIGH SPEED ROAD & MOVING GRID
+    // 1. HIGH SPEED ROAD & MULTI-LANE HIGHWAY
     // ==========================================
     const roadGroup = new THREE.Group();
     scene.add(roadGroup);
 
-    // Asphalt Plane
-    const roadGeo = new THREE.PlaneGeometry(14, 80);
+    // 4-Lane Asphalt Road Plane
+    const roadGeo = new THREE.PlaneGeometry(16, 120);
     const roadMat = new THREE.MeshStandardMaterial({
-      color: 0x111827,
-      roughness: 0.8,
-      metalness: 0.2
+      color: 0x0f172a,
+      roughness: 0.75,
+      metalness: 0.3
     });
     const road = new THREE.Mesh(roadGeo, roadMat);
     road.rotation.x = -Math.PI / 2;
     road.position.y = -0.05;
     roadGroup.add(road);
 
-    // Dashed center road lines
-    const stripeCount = 20;
-    const stripes = [];
-    const stripeGeo = new THREE.PlaneGeometry(0.3, 2.2);
+    // Dashed center road stripes (3 dividers for 4 lanes)
+    const stripeCount = 28;
+    const stripesL = [];
+    const stripesC = [];
+    const stripesR = [];
+    const stripeGeo = new THREE.PlaneGeometry(0.24, 2.5);
     const stripeMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
 
     for (let i = 0; i < stripeCount; i++) {
-      const stripe = new THREE.Mesh(stripeGeo, stripeMat);
-      stripe.rotation.x = -Math.PI / 2;
-      stripe.position.set(0, 0, (i - 10) * 4);
-      roadGroup.add(stripe);
-      stripes.push(stripe);
+      const zPos = (i - 14) * 4.2;
+
+      const sL = new THREE.Mesh(stripeGeo, stripeMat);
+      sL.rotation.x = -Math.PI / 2;
+      sL.position.set(-3.5, 0, zPos);
+      roadGroup.add(sL);
+      stripesL.push(sL);
+
+      const sC = new THREE.Mesh(stripeGeo, stripeMat);
+      sC.rotation.x = -Math.PI / 2;
+      sC.position.set(0, 0, zPos);
+      roadGroup.add(sC);
+      stripesC.push(sC);
+
+      const sR = new THREE.Mesh(stripeGeo, stripeMat);
+      sR.rotation.x = -Math.PI / 2;
+      sR.position.set(3.5, 0, zPos);
+      roadGroup.add(sR);
+      stripesR.push(sR);
     }
 
-    // Side guard rails (neon green corridor)
-    const railMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.65 });
-    const leftRail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 80), railMat);
-    leftRail.position.set(-6.5, 0.1, 0);
-    roadGroup.add(leftRail);
+    // Glowing Green Highway Emergency Corridor Barriers
+    const barrierMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.75 });
+    const leftBarrier = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.45, 120), barrierMat);
+    leftBarrier.position.set(-7.9, 0.2, 0);
+    roadGroup.add(leftBarrier);
 
-    const rightRail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.3, 80), railMat);
-    rightRail.position.set(6.5, 0.1, 0);
-    roadGroup.add(rightRail);
+    const rightBarrier = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.45, 120), barrierMat);
+    rightBarrier.position.set(7.9, 0.2, 0);
+    roadGroup.add(rightBarrier);
 
-    // Distant futuristic city silhouettes
-    const buildingsGroup = new THREE.Group();
-    for (let i = -15; i <= 15; i += 3) {
-      const bHeight = 3 + Math.random() * 8;
-      const bGeo = new THREE.BoxGeometry(2 + Math.random() * 2, bHeight, 2.5);
-      const bMat = new THREE.MeshBasicMaterial({
-        color: 0x1e293b,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.4
+    // City Neon Skyscrapers Silhouettes
+    const cityGroup = new THREE.Group();
+    for (let i = -20; i <= 20; i += 3) {
+      const bHeight = 4 + Math.random() * 10;
+      const bGeo = new THREE.BoxGeometry(2.5 + Math.random() * 2, bHeight, 3.2);
+      const bColor = i % 2 === 0 ? 0x1e293b : 0x0f172a;
+      const bMat = new THREE.MeshStandardMaterial({
+        color: bColor,
+        roughness: 0.9,
+        wireframe: Math.random() > 0.6
       });
 
-      const bLeft = new THREE.Mesh(bGeo, bMat);
-      bLeft.position.set(-11 - Math.random() * 3, bHeight / 2, i * 2.5);
-      buildingsGroup.add(bLeft);
+      const bL = new THREE.Mesh(bGeo, bMat);
+      bL.position.set(-13 - Math.random() * 3, bHeight / 2, i * 2.8);
+      cityGroup.add(bL);
 
-      const bRight = new THREE.Mesh(bGeo, bMat);
-      bRight.position.set(11 + Math.random() * 3, bHeight / 2, i * 2.5);
-      buildingsGroup.add(bRight);
+      const bR = new THREE.Mesh(bGeo, bMat);
+      bR.position.set(13 + Math.random() * 3, bHeight / 2, i * 2.8);
+      cityGroup.add(bR);
     }
-    scene.add(buildingsGroup);
+    scene.add(cityGroup);
 
     // ==========================================
-    // 2. 3D AMBULANCE MODEL
+    // 2. 3D AMBULANCE MODEL WITH STEERING & BODY ROLL
     // ==========================================
-    const ambulanceGroup = new THREE.Group();
-    scene.add(ambulanceGroup);
-    ambulanceGroup.position.set(0, 0.45, 0);
+    const ambulanceRoot = new THREE.Group();
+    scene.add(ambulanceRoot);
+    ambulanceRoot.position.set(0, 0.45, 0);
 
-    // Main Body Chassis
+    // Main Chassis
     const bodyMat = new THREE.MeshStandardMaterial({
       color: 0xf8fafc,
-      roughness: 0.3,
-      metalness: 0.5
+      roughness: 0.25,
+      metalness: 0.4
     });
-    const mainBody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 3.4), bodyMat);
-    mainBody.position.y = 0.5;
-    ambulanceGroup.add(mainBody);
+    const mainBody = new THREE.Mesh(new THREE.BoxGeometry(1.68, 1.25, 3.6), bodyMat);
+    mainBody.position.y = 0.55;
+    ambulanceRoot.add(mainBody);
 
-    // Front Cabin Cab
-    const cabGeo = new THREE.BoxGeometry(1.58, 0.95, 1.3);
-    const cab = new THREE.Mesh(cabGeo, bodyMat);
-    cab.position.set(0, 0.35, -1.8);
-    ambulanceGroup.add(cab);
+    // Front Cab
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.66, 1.0, 1.4), bodyMat);
+    cab.position.set(0, 0.4, -1.9);
+    ambulanceRoot.add(cab);
 
-    // Windshield Glass (dark cyan tinted)
+    // Windshield
     const glassMat = new THREE.MeshPhysicalMaterial({
       color: 0x0284c7,
-      metalness: 0.9,
+      metalness: 0.8,
       roughness: 0.1,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.85
     });
-    const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.55, 0.1), glassMat);
-    windshield.position.set(0, 0.55, -2.46);
-    windshield.rotation.x = 0.15;
-    ambulanceGroup.add(windshield);
+    const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.6, 0.1), glassMat);
+    windshield.position.set(0, 0.62, -2.62);
+    windshield.rotation.x = 0.18;
+    ambulanceRoot.add(windshield);
 
-    // Red Emergency Medical Cross on side
+    // Red Emergency Medical Cross on sides
     const crossRedMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
-    const crossV1 = new THREE.Mesh(new THREE.PlaneGeometry(0.25, 0.7), crossRedMat);
-    crossV1.position.set(0.81, 0.6, 0);
-    crossV1.rotation.y = Math.PI / 2;
-    ambulanceGroup.add(crossV1);
+    const addSideCross = (xPos, rotY) => {
+      const v = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.75), crossRedMat);
+      v.position.set(xPos, 0.65, 0.1);
+      v.rotation.y = rotY;
+      ambulanceRoot.add(v);
 
-    const crossH1 = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.25), crossRedMat);
-    crossH1.position.set(0.81, 0.6, 0);
-    crossH1.rotation.y = Math.PI / 2;
-    ambulanceGroup.add(crossH1);
+      const h = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.26), crossRedMat);
+      h.position.set(xPos, 0.65, 0.1);
+      h.rotation.y = rotY;
+      ambulanceRoot.add(h);
+    };
+    addSideCross(0.85, Math.PI / 2);
+    addSideCross(-0.85, -Math.PI / 2);
 
-    const crossV2 = new THREE.Mesh(new THREE.PlaneGeometry(0.25, 0.7), crossRedMat);
-    crossV2.position.set(-0.81, 0.6, 0);
-    crossV2.rotation.y = -Math.PI / 2;
-    ambulanceGroup.add(crossV2);
-
-    const crossH2 = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.25), crossRedMat);
-    crossH2.position.set(-0.81, 0.6, 0);
-    crossH2.rotation.y = -Math.PI / 2;
-    ambulanceGroup.add(crossH2);
-
-    // Wheels
-    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.9 });
-    const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 16);
+    // Front Steerable Wheels (with independent turning pivots)
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.95 });
+    const wheelGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.28, 16);
     wheelGeo.rotateZ(Math.PI / 2);
 
+    const steerPivotFL = new THREE.Group();
+    steerPivotFL.position.set(-0.9, 0, -1.6);
+    ambulanceRoot.add(steerPivotFL);
     const wheelFL = new THREE.Mesh(wheelGeo, wheelMat);
-    wheelFL.position.set(-0.85, 0, -1.5);
-    ambulanceGroup.add(wheelFL);
+    steerPivotFL.add(wheelFL);
 
+    const steerPivotFR = new THREE.Group();
+    steerPivotFR.position.set(0.9, 0, -1.6);
+    ambulanceRoot.add(steerPivotFR);
     const wheelFR = new THREE.Mesh(wheelGeo, wheelMat);
-    wheelFR.position.set(0.85, 0, -1.5);
-    ambulanceGroup.add(wheelFR);
+    steerPivotFR.add(wheelFR);
 
+    // Rear Fixed Wheels
     const wheelRL = new THREE.Mesh(wheelGeo, wheelMat);
-    wheelRL.position.set(-0.85, 0, 1.0);
-    ambulanceGroup.add(wheelRL);
+    wheelRL.position.set(-0.9, 0, 1.1);
+    ambulanceRoot.add(wheelRL);
 
     const wheelRR = new THREE.Mesh(wheelGeo, wheelMat);
-    wheelRR.position.set(0.85, 0, 1.0);
-    ambulanceGroup.add(wheelRR);
+    wheelRR.position.set(0.9, 0, 1.1);
+    ambulanceRoot.add(wheelRR);
 
     // Headlights
     const headlightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-    const headlightL = new THREE.Mesh(new THREE.CircleGeometry(0.12, 12), headlightMat);
-    headlightL.position.set(-0.55, 0.2, -2.46);
-    headlightL.rotation.y = Math.PI;
-    ambulanceGroup.add(headlightL);
+    const hL = new THREE.Mesh(new THREE.CircleGeometry(0.14, 12), headlightMat);
+    hL.position.set(-0.58, 0.25, -2.62);
+    hL.rotation.y = Math.PI;
+    ambulanceRoot.add(hL);
 
-    const headlightR = new THREE.Mesh(new THREE.CircleGeometry(0.12, 12), headlightMat);
-    headlightR.position.set(0.55, 0.2, -2.46);
-    headlightR.rotation.y = Math.PI;
-    ambulanceGroup.add(headlightR);
+    const hR = new THREE.Mesh(new THREE.CircleGeometry(0.14, 12), headlightMat);
+    hR.position.set(0.58, 0.25, -2.62);
+    hR.rotation.y = Math.PI;
+    ambulanceRoot.add(hR);
 
-    // Headlight Spotlights
-    const spotL = new THREE.SpotLight(0xfef08a, 4, 18, Math.PI / 6, 0.4);
-    spotL.position.set(-0.55, 0.2, -2.5);
-    spotL.target.position.set(-0.55, -0.5, -12);
+    // Headlight Long Spotlights
+    const spotL = new THREE.SpotLight(0xfef08a, 4.5, 26, Math.PI / 5, 0.35);
+    spotL.position.set(-0.58, 0.25, -2.7);
+    spotL.target.position.set(-0.58, -0.5, -16);
     scene.add(spotL);
     scene.add(spotL.target);
 
+    const spotR = new THREE.SpotLight(0xfef08a, 4.5, 26, Math.PI / 5, 0.35);
+    spotR.position.set(0.58, 0.25, -2.7);
+    spotR.target.position.set(0.58, -0.5, -16);
+    scene.add(spotR);
+    scene.add(spotR.target);
+
     // ==========================================
-    // 3. EMERGENCY ROOF SIREN & FLASHING LIGHTS
+    // 3. 360° ROTATING VOLUMETRIC ROOF SIREN BEAMS
     // ==========================================
     const sirenBar = new THREE.Mesh(
-      new THREE.BoxGeometry(0.9, 0.15, 0.3),
+      new THREE.BoxGeometry(0.95, 0.16, 0.35),
       new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8 })
     );
-    sirenBar.position.set(0, 1.18, -1.4);
-    ambulanceGroup.add(sirenBar);
+    sirenBar.position.set(0, 1.25, -1.4);
+    ambulanceRoot.add(sirenBar);
 
-    // Red Siren Light
-    const sirenRed = new THREE.PointLight(0xef4444, 5, 12);
-    sirenRed.position.set(-0.35, 1.35, -1.4);
-    ambulanceGroup.add(sirenRed);
+    // Point lights
+    const sirenRed = new THREE.PointLight(0xef4444, 6, 15);
+    sirenRed.position.set(-0.36, 1.45, -1.4);
+    ambulanceRoot.add(sirenRed);
 
-    // Blue Siren Light
-    const sirenBlue = new THREE.PointLight(0x3b82f6, 5, 12);
-    sirenBlue.position.set(0.35, 1.35, -1.4);
-    ambulanceGroup.add(sirenBlue);
+    const sirenBlue = new THREE.PointLight(0x38bdf8, 6, 15);
+    sirenBlue.position.set(0.36, 1.45, -1.4);
+    ambulanceRoot.add(sirenBlue);
 
-    // ==========================================
-    // 4. DESTINATION RADAR PULSE (FRONT TARGET)
-    // ==========================================
-    const radarRingMat = new THREE.MeshBasicMaterial({
-      color: 0x10b981,
+    // 3D Sweeping Searchlight Cones (Volumetric Beam Effect)
+    const coneGeo = new THREE.ConeGeometry(1.6, 6.0, 16, 1, true);
+    coneGeo.rotateX(Math.PI / 2);
+    coneGeo.translate(0, 0, -3.0);
+
+    const redBeamMat = new THREE.MeshBasicMaterial({
+      color: 0xef4444,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide
     });
-    const radarRing1 = new THREE.Mesh(new THREE.RingGeometry(0.8, 0.9, 32), radarRingMat);
-    radarRing1.rotation.x = -Math.PI / 2;
-    radarRing1.position.set(0, 0.05, -18);
-    scene.add(radarRing1);
+    const blueBeamMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
 
-    const radarRing2 = new THREE.Mesh(new THREE.RingGeometry(1.6, 1.7, 32), radarRingMat);
-    radarRing2.rotation.x = -Math.PI / 2;
-    radarRing2.position.set(0, 0.05, -18);
-    scene.add(radarRing2);
+    const rotatingSirenGroupRed = new THREE.Group();
+    rotatingSirenGroupRed.position.set(-0.36, 1.35, -1.4);
+    const redBeam = new THREE.Mesh(coneGeo, redBeamMat);
+    rotatingSirenGroupRed.add(redBeam);
+    ambulanceRoot.add(rotatingSirenGroupRed);
 
-    // Destination Marker Post
-    const beaconPost = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.08, 0.08, 3, 12),
-      new THREE.MeshBasicMaterial({ color: 0x10b981 })
-    );
-    beaconPost.position.set(0, 1.5, -18);
-    scene.add(beaconPost);
+    const rotatingSirenGroupBlue = new THREE.Group();
+    rotatingSirenGroupBlue.position.set(0.36, 1.35, -1.4);
+    const blueBeam = new THREE.Mesh(coneGeo, blueBeamMat);
+    rotatingSirenGroupBlue.add(blueBeam);
+    ambulanceRoot.add(rotatingSirenGroupBlue);
 
-    // Resize handler
+    // ==========================================
+    // 4. CIVILIAN TRAFFIC CARS BEING OVERTAKEN
+    // ==========================================
+    const trafficCars = [];
+    const trafficColors = [0x3b82f6, 0xf59e0b, 0x10b981];
+
+    for (let c = 0; c < 3; c++) {
+      const tGroup = new THREE.Group();
+
+      const tBodyMat = new THREE.MeshStandardMaterial({
+        color: trafficColors[c],
+        roughness: 0.4
+      });
+      const tBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.8, 2.8), tBodyMat);
+      tBody.position.y = 0.4;
+      tGroup.add(tBody);
+
+      // Red taillights
+      const tailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+      const tTailL = new THREE.Mesh(new THREE.CircleGeometry(0.1, 10), tailMat);
+      tTailL.position.set(-0.55, 0.4, 1.41);
+      tGroup.add(tTailL);
+      const tTailR = new THREE.Mesh(new THREE.CircleGeometry(0.1, 10), tailMat);
+      tTailR.position.set(0.55, 0.4, 1.41);
+      tGroup.add(tTailR);
+
+      // Blinker (yielding to ambulance)
+      const blinkerMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+      const blinker = new THREE.Mesh(new THREE.CircleGeometry(0.08, 10), blinkerMat);
+      blinker.position.set(0.65, 0.4, 1.41);
+      tGroup.add(blinker);
+
+      // Position in lanes ahead
+      const startLane = c === 0 ? -2.8 : c === 1 ? 2.8 : -1.8;
+      const startZ = -18 - c * 24;
+      tGroup.position.set(startLane, 0, startZ);
+
+      tGroup.userData = {
+        baseLaneX: startLane,
+        pullOverTargetX: startLane < 0 ? -5.5 : 5.5, // Pull over to shoulder
+        speedZ: 0.28,
+        blinker: blinker
+      };
+
+      scene.add(tGroup);
+      trafficCars.push(tGroup);
+    }
+
+    // ==========================================
+    // 5. DUAL NITRO EXHAUST & SMOKE PARTICLES
+    // ==========================================
+    const exhaustCount = 80;
+    const exhaustGeo = new THREE.BufferGeometry();
+    const exhaustPositions = new Float32Array(exhaustCount * 3);
+    const exhaustColors = new Float32Array(exhaustCount * 3);
+    const exhaustLifespans = new Float32Array(exhaustCount);
+
+    for (let i = 0; i < exhaustCount; i++) {
+      exhaustPositions[i * 3] = (Math.random() > 0.5 ? 0.5 : -0.5);
+      exhaustPositions[i * 3 + 1] = 0.15;
+      exhaustPositions[i * 3 + 2] = 1.9 + Math.random() * 2;
+
+      exhaustColors[i * 3] = 0.2;
+      exhaustColors[i * 3 + 1] = 0.8;
+      exhaustColors[i * 3 + 2] = 1.0;
+      exhaustLifespans[i] = Math.random();
+    }
+
+    exhaustGeo.setAttribute('position', new THREE.BufferAttribute(exhaustPositions, 3));
+    exhaustGeo.setAttribute('color', new THREE.BufferAttribute(exhaustColors, 3));
+
+    const exhaustMat = new THREE.PointsMaterial({
+      size: 0.22,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending
+    });
+    const exhaustParticles = new THREE.Points(exhaustGeo, exhaustMat);
+    scene.add(exhaustParticles);
+
+    // ==========================================
+    // 6. WARP SPEED LINES (HYPER VELOCITY EFFECT)
+    // ==========================================
+    const warpCount = 90;
+    const warpGeo = new THREE.BufferGeometry();
+    const warpPos = new Float32Array(warpCount * 6); // 2 vertices per streak
+
+    for (let i = 0; i < warpCount; i++) {
+      const wx = (Math.random() - 0.5) * 14;
+      const wy = 0.2 + Math.random() * 5;
+      const wz = -40 + Math.random() * 60;
+
+      warpPos[i * 6] = wx;
+      warpPos[i * 6 + 1] = wy;
+      warpPos[i * 6 + 2] = wz;
+
+      warpPos[i * 6 + 3] = wx;
+      warpPos[i * 6 + 4] = wy;
+      warpPos[i * 6 + 5] = wz + 3.5;
+    }
+    warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
+    const warpMat = new THREE.LineBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.4
+    });
+    const warpLines = new THREE.LineSegments(warpGeo, warpMat);
+    scene.add(warpLines);
+
+    // ==========================================
+    // 7. DESTINATION RADAR BEACON
+    // ==========================================
+    const radarMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.8, side: THREE.DoubleSide });
+    const radarRing = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.35, 32), radarMat);
+    radarRing.rotation.x = -Math.PI / 2;
+    radarRing.position.set(0, 0.05, -28);
+    scene.add(radarRing);
+
+    // Resize Handler
     const handleResize = () => {
       if (!currentMount) return;
       width = currentMount.clientWidth;
-      height = currentMount.clientHeight || 280;
+      height = currentMount.clientHeight || 300;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
@@ -261,7 +420,7 @@ export default function ThreeAmbulanceTracker({ isDispatched = true, etaSeconds 
     window.addEventListener('resize', handleResize);
 
     // ==========================================
-    // 5. ANIMATION LOOP
+    // 8. REAL-TIME ANIMATION LOOP (PHYSICS & MOTION)
     // ==========================================
     let frameId;
     let clock = new THREE.Clock();
@@ -269,57 +428,174 @@ export default function ThreeAmbulanceTracker({ isDispatched = true, etaSeconds 
     const animate = () => {
       frameId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
+      const turboMultiplier = isTurboRef.current ? 1.75 : 1.0;
 
-      // Flashing Alternating Sirens (Strobe effect)
-      const flash = Math.sin(elapsed * 18);
-      sirenRed.intensity = flash > 0 ? 8 : 0.2;
-      sirenBlue.intensity = flash <= 0 ? 8 : 0.2;
+      // Update speedometer state every 15 frames
+      if (Math.floor(elapsed * 60) % 15 === 0) {
+        const baseSpd = isTurboRef.current ? 128 : 78;
+        const jitter = Math.floor(Math.sin(elapsed * 10) * 3);
+        setSpeedKmh(baseSpd + jitter);
+      }
 
-      // Road Stripes High-Speed Scroll
-      stripes.forEach((stripe) => {
-        stripe.position.z += 0.8;
-        if (stripe.position.z > 30) {
-          stripe.position.z = -50;
+      // ==========================================
+      // A. DYNAMIC LANE SLALOM & CHASSIS BODY ROLL
+      // ==========================================
+      const slalomSpeed = elapsed * 1.6 * turboMultiplier;
+      // Weaves between -2.2 (left lane) and +2.2 (right lane)
+      const targetLaneX = Math.sin(slalomSpeed) * 2.2;
+      const steeringRate = Math.cos(slalomSpeed) * 0.35; // velocity derivative
+
+      ambulanceRoot.position.x += (targetLaneX - ambulanceRoot.position.x) * 0.08;
+      // Body roll: tilts into the turn
+      ambulanceRoot.rotation.z = -steeringRate * 0.65;
+      // Wheel turning angle
+      steerPivotFL.rotation.y = steeringRate * 1.1;
+      steerPivotFR.rotation.y = steeringRate * 1.1;
+
+      // Suspension bounce over pavement joints
+      const suspensionBump = Math.sin(elapsed * 32 * turboMultiplier) * 0.025;
+      ambulanceRoot.position.y = 0.45 + Math.abs(suspensionBump);
+      ambulanceRoot.rotation.x = Math.sin(elapsed * 16) * 0.015;
+
+      // Synchronize headlight spotlights
+      spotL.position.x = ambulanceRoot.position.x - 0.58;
+      spotL.target.position.x = ambulanceRoot.position.x - 0.58;
+      spotR.position.x = ambulanceRoot.position.x + 0.58;
+      spotR.target.position.x = ambulanceRoot.position.x + 0.58;
+
+      // ==========================================
+      // B. ROTATING VOLUMETRIC SIRENS & FLASHES
+      // ==========================================
+      const sirenRotSpeed = elapsed * 14;
+      rotatingSirenGroupRed.rotation.y = sirenRotSpeed;
+      rotatingSirenGroupBlue.rotation.y = -sirenRotSpeed;
+
+      const flash = Math.sin(elapsed * 24);
+      sirenRed.intensity = flash > 0 ? 10 : 0.8;
+      sirenBlue.intensity = flash <= 0 ? 10 : 0.8;
+
+      // ==========================================
+      // C. HIGH-SPEED ROAD STRIPES SCROLL
+      // ==========================================
+      const stripeSpeed = 0.9 * turboMultiplier;
+      const updateStripes = (arr) => {
+        arr.forEach((s) => {
+          s.position.z += stripeSpeed;
+          if (s.position.z > 35) s.position.z = -55;
+        });
+      };
+      updateStripes(stripesL);
+      updateStripes(stripesC);
+      updateStripes(stripesR);
+
+      cityGroup.position.z += 0.35 * turboMultiplier;
+      if (cityGroup.position.z > 25) cityGroup.position.z = -25;
+
+      // ==========================================
+      // D. CIVILIAN TRAFFIC OVERTAKING & YIELDING
+      // ==========================================
+      trafficCars.forEach((car) => {
+        // Move car backwards relative to ambulance
+        car.position.z += 0.55 * turboMultiplier;
+
+        // When ambulance is within 18 units behind, car pulls over to the shoulder!
+        if (car.position.z > -16 && car.position.z < 10) {
+          car.position.x += (car.userData.pullOverTargetX - car.position.x) * 0.05;
+          // Blinker flash
+          car.userData.blinker.material.color.setHex((Math.sin(elapsed * 16) > 0) ? 0xf59e0b : 0x334155);
+        } else if (car.position.z > 25) {
+          // Reset ahead
+          car.position.z = -65 - Math.random() * 20;
+          car.position.x = car.userData.baseLaneX;
         }
       });
 
-      // City buildings subtle drift
-      buildingsGroup.position.z += 0.4;
-      if (buildingsGroup.position.z > 25) {
-        buildingsGroup.position.z = -25;
+      // ==========================================
+      // E. EXHAUST PARTICLES EMISSION
+      // ==========================================
+      const posAttr = exhaustGeo.attributes.position;
+      for (let i = 0; i < exhaustCount; i++) {
+        let pz = posAttr.getZ(i);
+        pz += (0.6 + Math.random() * 0.4) * turboMultiplier;
+        if (pz > 12) {
+          // Respawn at ambulance tailpipe
+          const side = (i % 2 === 0 ? 0.55 : -0.55);
+          posAttr.setXYZ(i, ambulanceRoot.position.x + side, 0.2 + Math.random() * 0.1, 1.8);
+        } else {
+          posAttr.setZ(i, pz);
+          // Smoke expands as it trails away
+          posAttr.setX(i, posAttr.getX(i) + (Math.random() - 0.5) * 0.04);
+          posAttr.setY(i, posAttr.getY(i) + 0.015);
+        }
       }
+      posAttr.needsUpdate = true;
 
-      // Ambulance physical sway / vibration
-      ambulanceGroup.position.y = 0.45 + Math.sin(elapsed * 24) * 0.02;
-      ambulanceGroup.rotation.z = Math.sin(elapsed * 4) * 0.015;
-      ambulanceGroup.rotation.y = Math.sin(elapsed * 2) * 0.01;
+      // ==========================================
+      // F. WARP SPEED LINES STREAKING
+      // ==========================================
+      const warpPosAttr = warpGeo.attributes.position;
+      const warpVelocity = (isTurboRef.current ? 2.5 : 1.2);
+      for (let i = 0; i < warpCount; i++) {
+        let z1 = warpPosAttr.getZ(i * 2);
+        let z2 = warpPosAttr.getZ(i * 2 + 1);
 
-      // Wheels rotation
-      wheelFL.rotation.x += 0.35;
-      wheelFR.rotation.x += 0.35;
-      wheelRL.rotation.x += 0.35;
-      wheelRR.rotation.x += 0.35;
+        z1 += warpVelocity;
+        z2 += warpVelocity;
 
-      // Radar pulse expansion
-      const rScale1 = 1.0 + (elapsed * 2) % 3;
-      radarRing1.scale.set(rScale1, rScale1, 1);
-      radarRing1.material.opacity = Math.max(0, 1.0 - (rScale1 - 1.0) / 3);
+        if (z1 > 15) {
+          const newZ = -45 - Math.random() * 20;
+          warpPosAttr.setZ(i * 2, newZ);
+          warpPosAttr.setZ(i * 2 + 1, newZ + (isTurboRef.current ? 6.5 : 3.5));
+        } else {
+          warpPosAttr.setZ(i * 2, z1);
+          warpPosAttr.setZ(i * 2 + 1, z2);
+        }
+      }
+      warpPosAttr.needsUpdate = true;
 
-      const rScale2 = 1.0 + ((elapsed * 2) + 1.5) % 3;
-      radarRing2.scale.set(rScale2, rScale2, 1);
-      radarRing2.material.opacity = Math.max(0, 1.0 - (rScale2 - 1.0) / 3);
+      // Radar pulse
+      const rScale = 1.0 + (elapsed * 2.5) % 4;
+      radarRing.scale.set(rScale, rScale, 1);
+      radarRing.material.opacity = Math.max(0, 1.0 - (rScale - 1.0) / 4);
 
-      // Camera view positioning
+      // ==========================================
+      // G. CAMERA WORK & DYNAMIC SHAKE
+      // ==========================================
+      const camRumble = (Math.sin(elapsed * 38) * 0.02) * (isTurboRef.current ? 2.2 : 1.0);
       const view = cameraViewRef.current;
+
       if (view === 'chase') {
-        camera.position.set(0, 2.8, 6.5);
-        camera.lookAt(0, 1.0, -4);
-      } else if (view === 'top') {
-        camera.position.set(0, 14, 0.5);
-        camera.lookAt(0, 0, -5);
+        // Smoothly follows ambulance X position with slight lag
+        const targetCamX = ambulanceRoot.position.x * 0.45;
+        camera.position.x += (targetCamX - camera.position.x) * 0.08 + camRumble;
+        camera.position.y = 2.7 + camRumble;
+        camera.position.z = 6.4 + (isTurboRef.current ? 0.6 : 0);
+        camera.lookAt(ambulanceRoot.position.x * 0.7, 1.1, -6);
+      } else if (view === 'cockpit') {
+        camera.position.set(ambulanceRoot.position.x, 1.2 + camRumble, -1.7);
+        camera.lookAt(ambulanceRoot.position.x + steeringRate * 2, 0.8, -25);
+      } else if (view === 'drone') {
+        camera.position.set(0, 15, 2.0);
+        camera.lookAt(ambulanceRoot.position.x, 0, -8);
       } else if (view === 'front') {
-        camera.position.set(0, 1.8, -7);
-        camera.lookAt(0, 1.2, 0);
+        camera.position.set(ambulanceRoot.position.x * 0.3, 1.6 + camRumble, -7.5);
+        camera.lookAt(ambulanceRoot.position.x, 1.0, 0);
+      } else if (view === 'action') {
+        // Dramatic action cut angle cycling every 4 seconds
+        const cut = Math.floor(elapsed / 4) % 3;
+        if (cut === 0) {
+          // Low wheel chase
+          camera.position.set(ambulanceRoot.position.x + 2.5, 0.6, 2.5);
+          camera.lookAt(ambulanceRoot.position.x, 0.8, -4);
+        } else if (cut === 1) {
+          // Front flyby
+          camera.position.set(-3.5, 1.4, -4.5);
+          camera.lookAt(ambulanceRoot.position.x, 1.0, 0);
+        } else {
+          // High chase
+          camera.position.set(ambulanceRoot.position.x * 0.5, 4.8, 8.5);
+          camera.lookAt(ambulanceRoot.position.x, 0.5, -5);
+        }
       }
 
       renderer.render(scene, camera);
@@ -343,32 +619,58 @@ export default function ThreeAmbulanceTracker({ isDispatched = true, etaSeconds 
 
       {/* Floating 3D Telemetry Overlay */}
       <div className="ambulance-telemetry-hud">
-        <div className="telemetry-chip siren-active">
-          <span className="flashing-siren-dot"></span>
-          <span>ALS Unit #04 • Priority 1 Transit</span>
+        <div className="hud-badge-stack">
+          <div className="telemetry-chip siren-active">
+            <span className="flashing-siren-dot"></span>
+            <span>ALS Unit #04 • Priority 1 Transit</span>
+          </div>
+
+          <div className="speedometer-pill">
+            <span className="speed-label">SPEED:</span>
+            <span className="speed-number">{speedKmh}</span>
+            <span className="speed-unit">KM/H</span>
+          </div>
         </div>
 
         <div className="telemetry-controls">
+          {/* Turbo Nitro Boost Button */}
+          <button
+            type="button"
+            className={`btn-turbo-boost ${isTurbo ? 'turbo-active' : ''}`}
+            onClick={() => setIsTurbo(!isTurbo)}
+            title="Engage High-Velocity Turbo Boost"
+          >
+            <span>{isTurbo ? '🔥 NITRO: 130 KM/H' : '⚡ BOOST'}</span>
+          </button>
+
+          {/* Camera View Toggles */}
           <button
             type="button"
             className={`btn-view-toggle ${cameraView === 'chase' ? 'active' : ''}`}
             onClick={() => setCameraView('chase')}
           >
-            Chase View
+            Chase
           </button>
           <button
             type="button"
-            className={`btn-view-toggle ${cameraView === 'top' ? 'active' : ''}`}
-            onClick={() => setCameraView('top')}
+            className={`btn-view-toggle ${cameraView === 'cockpit' ? 'active' : ''}`}
+            onClick={() => setCameraView('cockpit')}
           >
-            Drone View
+            Cockpit
           </button>
           <button
             type="button"
             className={`btn-view-toggle ${cameraView === 'front' ? 'active' : ''}`}
             onClick={() => setCameraView('front')}
           >
-            Front View
+            Front
+          </button>
+          <button
+            type="button"
+            className={`btn-view-toggle ${cameraView === 'action' ? 'active' : ''}`}
+            onClick={() => setCameraView('action')}
+          >
+            🎬 Action Cam
           </button>
         </div>
       </div>

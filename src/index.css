@@ -1995,6 +1995,44 @@ body .app-root.hide-dt-annotations .interaction-point-wrapper {
   align-items: center;
   justify-content: space-between;
   pointer-events: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hud-badge-stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speedometer-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #38bdf8;
+  backdrop-filter: blur(4px);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.speed-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.speed-number {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #38bdf8;
+}
+
+.speed-unit {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #64748b;
 }
 
 .telemetry-chip {
@@ -2027,8 +2065,40 @@ body .app-root.hide-dt-annotations .interaction-point-wrapper {
 
 .telemetry-controls {
   display: flex;
+  align-items: center;
   gap: 6px;
   pointer-events: auto;
+  flex-wrap: wrap;
+}
+
+.btn-turbo-boost {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 1.5px solid #fbbf24;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.btn-turbo-boost:hover {
+  transform: scale(1.05);
+}
+
+.btn-turbo-boost.turbo-active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #f87171;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.8);
+  animation: turbo-pulse 0.6s infinite alternate;
+}
+
+@keyframes turbo-pulse {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.06); filter: brightness(1.25); }
 }
 
 .btn-view-toggle {
