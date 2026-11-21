@@ -6,7 +6,18 @@ An interactive, 3D-powered Hospital Appointment Booking Prototype developed with
 
 ---
 
-## 🎯 Design Thinking Core Framework
+## 🚀 Key Features
+
+### 1. 3D WebGL Campus & Ambulance Dispatch
+- **3D Interactive Campus Navigator:** Pulsing medical cross and orbiting department nodes (Cardiology, Orthopedics, Pediatrics, Neurology, Dermatology) with mouse raycasting.
+- **🚨 3D Ambulance Dispatch Tracker:** Real-time 3D simulation with dynamic moving highway, chassis, rotating headlights, flashing emergency red/blue strobe sirens, live GPS countdown, and Web Audio siren generator.
+
+### 2. 🎙️ AI Voice Booking Assistant & Bilingual Support
+- **Speech-to-Text Booking:** Tap the microphone and say your symptom or doctor in English or Hindi (e.g. *"Book Cardiology with Dr. Sharma"* or *"बच्चे के डॉक्टर से मिलना है"*).
+- **Natural Language Triage Parser:** Automatically identifies the specialty, selects the optimal time slot, and confirms via speech synthesis.
+- **🌐 Bilingual Toggle:** Instant one-click switch between **English** and **हिन्दी** across all interface elements.
+
+### 3. 🎯 Design Thinking Core Framework
 
 This prototype was engineered to address 3 core Design Thinking requirements:
 

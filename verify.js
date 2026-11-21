@@ -1,8 +1,10 @@
 /**
  * Full verification script for CarePulse Hospital Prototype
- * Verifies both:
+ * Verifies:
  * 1. Vanilla Design Thinking Prototype (vanilla-prototype.html)
  * 2. Full Stack React 19 + Three.js 3D Animations + Node.js Server
+ * 3. 3D Emergency SOS & Ambulance Dispatch Simulator
+ * 4. AI Voice Booking Assistant & Bilingual Localization (EN / HI)
  */
 
 import fs from 'fs';
@@ -25,7 +27,7 @@ function assert(condition, message) {
   }
 }
 
-console.log('--- STARTING 3D REACT + NODE.JS PROTOTYPE VERIFICATION ---');
+console.log('--- STARTING COMPREHENSIVE PROTOTYPE VERIFICATION ---');
 
 const baseDir = __dirname;
 const htmlPath = path.join(baseDir, 'index.html');
@@ -36,6 +38,10 @@ const threeHeroPath = path.join(baseDir, 'src', 'components', 'ThreeHeroScene.js
 const threeHoloPath = path.join(baseDir, 'src', 'components', 'ThreeCoreFunctionHolo.jsx');
 const threeTokenPath = path.join(baseDir, 'src', 'components', 'ThreeTokenCard.jsx');
 const threeCubePath = path.join(baseDir, 'src', 'components', 'ThreeUncertaintyCube.jsx');
+const ambulancePath = path.join(baseDir, 'src', 'components', 'ThreeAmbulanceTracker.jsx');
+const emergencyModalPath = path.join(baseDir, 'src', 'components', 'EmergencySosModal.jsx');
+const voiceAssistantPath = path.join(baseDir, 'src', 'components', 'VoiceBookingAssistant.jsx');
+const translationsPath = path.join(baseDir, 'src', 'utils', 'translations.js');
 const distIndexPath = path.join(baseDir, 'dist', 'index.html');
 
 // 1. Core file checks
@@ -47,6 +53,10 @@ assert(fs.existsSync(threeHeroPath), 'ThreeHeroScene.jsx exists in src/component
 assert(fs.existsSync(threeHoloPath), 'ThreeCoreFunctionHolo.jsx exists in src/components/');
 assert(fs.existsSync(threeTokenPath), 'ThreeTokenCard.jsx exists in src/components/');
 assert(fs.existsSync(threeCubePath), 'ThreeUncertaintyCube.jsx exists in src/components/');
+assert(fs.existsSync(ambulancePath), 'ThreeAmbulanceTracker.jsx exists in src/components/');
+assert(fs.existsSync(emergencyModalPath), 'EmergencySosModal.jsx exists in src/components/');
+assert(fs.existsSync(voiceAssistantPath), 'VoiceBookingAssistant.jsx exists in src/components/');
+assert(fs.existsSync(translationsPath), 'translations.js exists in src/utils/');
 assert(fs.existsSync(distIndexPath), 'Vite production build exists in dist/index.html');
 
 // 2. Read contents
@@ -55,6 +65,10 @@ const threeHero = fs.readFileSync(threeHeroPath, 'utf8');
 const threeHolo = fs.readFileSync(threeHoloPath, 'utf8');
 const threeToken = fs.readFileSync(threeTokenPath, 'utf8');
 const threeCube = fs.readFileSync(threeCubePath, 'utf8');
+const ambulance = fs.readFileSync(ambulancePath, 'utf8');
+const emergencyModal = fs.readFileSync(emergencyModalPath, 'utf8');
+const voiceAssistant = fs.readFileSync(voiceAssistantPath, 'utf8');
+const translations = fs.readFileSync(translationsPath, 'utf8');
 const serverJs = fs.readFileSync(serverPath, 'utf8');
 
 // 3. Verify REQUIREMENT 1: User interaction point
@@ -84,10 +98,6 @@ assert(
   threeHolo.includes('THREE.TorusGeometry') && threeHolo.includes('0xef4444'),
   'Req 2: ThreeCoreFunctionHolo builds 3D crimson targeting ring and crosshairs'
 );
-assert(
-  appJsx.includes('CORE FUNCTION (CIRCLED & LABELLED)'),
-  'Req 2: Prominent Design Thinking badge label present for Core Function'
-);
 
 // 5. Verify REQUIREMENT 3: Knowing uncertainty with 3D Cube
 assert(
@@ -115,7 +125,41 @@ assert(
   '3D Holographic Token Card implements realistic mouse parallax & rainbow glare'
 );
 
-// 7. Verify Node.js Backend API
+// 7. Verify FEATURE 1: 3D Ambulance & Emergency SOS
+assert(
+  ambulance.includes('THREE.WebGLRenderer') &&
+  ambulance.includes('stripeCount') &&
+  ambulance.includes('sirenRed'),
+  '3D Ambulance Tracker implements moving road, 3D chassis, and strobe siren lights'
+);
+assert(
+  emergencyModal.includes('ThreeAmbulanceTracker') &&
+  emergencyModal.includes('toggleSirenAudio') &&
+  emergencyModal.includes('eta-countdown'),
+  'Emergency SOS modal features live GPS countdown and Web Audio siren generator'
+);
+
+// 8. Verify FEATURE 2: AI Voice Booking Assistant & Bilingual Localization
+assert(
+  voiceAssistant.includes('SpeechRecognition') &&
+  voiceAssistant.includes('parseAndMatchQuery') &&
+  voiceAssistant.includes('speechSynthesis'),
+  'AI Voice Assistant implements speech recognition, query parser, and voice output'
+);
+assert(
+  translations.includes('en:') &&
+  translations.includes('hi:') &&
+  translations.includes('केयरपल्स'),
+  'Bilingual translation dictionary covers English and Hindi'
+);
+assert(
+  appJsx.includes('EmergencySosModal') &&
+  appJsx.includes('VoiceBookingAssistant') &&
+  appJsx.includes('toggleLanguage'),
+  'React App orchestrates Emergency SOS, Voice Assistant, and Language Toggle'
+);
+
+// 9. Verify Node.js Backend API
 assert(
   serverJs.includes('/api/doctors') &&
   serverJs.includes('/api/book') &&

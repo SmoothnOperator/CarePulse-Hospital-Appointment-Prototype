@@ -5,6 +5,9 @@ import ThreeTokenCard from './components/ThreeTokenCard.jsx';
 import ThreeUncertaintyCube from './components/ThreeUncertaintyCube.jsx';
 import FastBookingModal from './components/FastBookingModal.jsx';
 import DesignThinkingCanvasModal from './components/DesignThinkingCanvasModal.jsx';
+import EmergencySosModal from './components/EmergencySosModal.jsx';
+import VoiceBookingAssistant from './components/VoiceBookingAssistant.jsx';
+import { translations } from './utils/translations.js';
 
 // Fallback doctors in case server is not running
 const initialDoctors = [
@@ -132,7 +135,13 @@ export default function App() {
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [show3DHero, setShow3DHero] = useState(true);
   const [showDtCanvas, setShowDtCanvas] = useState(false);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [lang, setLang] = useState('en'); // 'en' or 'hi'
   const [telemetry, setTelemetry] = useState(null);
+
+  // Active dictionary
+  const t = translations[lang] || translations.en;
 
   // Active slot selection state per doctor: { [doctorId]: slotObject }
   const [selectedSlots, setSelectedSlots] = useState({});
@@ -190,22 +199,49 @@ export default function App() {
     setBookingConfirmation(confirmationData);
   };
 
+  // Handler when voice assistant matches a query
+  const handleVoiceMatch = (docId, slot) => {
+    const matchedDoc = doctors.find(d => d.id === docId) || doctors[0];
+    setSelectedSpecialty('all');
+    setSearchQuery('');
+    setSelectedSlots(prev => ({
+      ...prev,
+      [matchedDoc.id]: slot
+    }));
+    // Open booking modal directly
+    setBookingTarget({ doctor: matchedDoc, slot });
+  };
+
+  const toggleLanguage = () => {
+    setLang(prev => (prev === 'en' ? 'hi' : 'en'));
+  };
+
   return (
     <div className={`app-root ${showAnnotations ? '' : 'hide-dt-annotations'}`}>
       
       {/* ========================================================
-           1. TOP DESIGN THINKING CONTROLLER BAR
+           1. TOP DESIGN THINKING & ACCESSIBILITY CONTROLLER BAR
            ======================================================== */}
       <aside className="dt-controller-bar" id="dtControllerBar">
         <div className="dt-bar-container">
           <div className="dt-badge-group">
-            <span className="dt-pill dt-pill-primary">Design Thinking Sprint</span>
-            <span className="dt-pill dt-pill-neutral">3D Interactive Prototype</span>
+            <span className="dt-pill dt-pill-primary">{t.dtSprint}</span>
+            <span className="dt-pill dt-pill-neutral">{t.dt3dProto}</span>
           </div>
 
           <div className="dt-controls">
+            {/* Bilingual Language Switcher */}
+            <button
+              type="button"
+              className="dt-lang-toggle-btn"
+              onClick={toggleLanguage}
+              title="Switch Language / भाषा बदलें"
+            >
+              <span>🌐 {t.langToggle}</span>
+            </button>
+
             <label className="dt-toggle-label" htmlFor="reactDtAnnotationToggle">
-              <span className="toggle-text">Show DT Annotations (Circled &amp; Labelled)</span>
+              <span className="toggle-text">{t.showAnnotations}</span>
               <div className="toggle-switch">
                 <input
                   type="checkbox"
@@ -218,17 +254,19 @@ export default function App() {
             </label>
 
             <button
+              type="button"
               className="dt-inspect-btn secondary"
               onClick={() => setShow3DHero(!show3DHero)}
             >
-              {show3DHero ? '🌐 3D Campus: ON' : '🌐 3D Campus: OFF'}
+              {show3DHero ? t.campus3dOn : t.campus3dOff}
             </button>
 
             <button
+              type="button"
               className="dt-inspect-btn"
               onClick={() => setShowDtCanvas(true)}
             >
-              📋 View Design Thinking Canvas
+              {t.viewDtCanvas}
             </button>
           </div>
         </div>
@@ -259,17 +297,23 @@ export default function App() {
               </svg>
             </div>
             <div className="brand-text">
-              <span className="brand-title">CarePulse</span>
-              <span className="brand-subtitle">Memorial Super-Speciality Hospital</span>
+              <span className="brand-title">{t.brandTitle}</span>
+              <span className="brand-subtitle">{t.brandSubtitle}</span>
             </div>
           </div>
 
           <nav className="nav-links">
-            <a href="#departments" className="nav-link active">Find Doctor</a>
-            <a href="#live-queue" className="nav-link">Live OPD Queue</a>
-            <a href="#emergency" className="nav-link emergency-link">
-              <span className="pulse-dot"></span> Emergency: 108 / (080) 4422-9900
-            </a>
+            <a href="#departments" className="nav-link active">{t.navFindDoctor}</a>
+            <a href="#departments" className="nav-link">{t.navLiveQueue}</a>
+            
+            {/* EMERGENCY SOS TRIGGER */}
+            <button
+              type="button"
+              className="nav-link emergency-link"
+              onClick={() => setShowEmergencyModal(true)}
+            >
+              <span className="pulse-dot"></span> {t.emergencySosBtn}
+            </button>
           </nav>
         </div>
       </header>
@@ -280,11 +324,9 @@ export default function App() {
       <section className="hero-section">
         <div className="container">
           <div className="hero-text">
-            <div className="hero-pill">⚡ 3D Interactive Fast-Track OPD Appointments</div>
-            <h1 className="hero-title">Book Verified Doctor Slots in Under 30 Seconds</h1>
-            <p className="hero-subtitle">
-              No 20-minute phone queues. No complex 5-page insurance forms. Select your symptom or department, tap an available slot, and walk straight into your consultation.
-            </p>
+            <div className="hero-pill">{t.heroPill}</div>
+            <h1 className="hero-title">{t.heroTitle}</h1>
+            <p className="hero-subtitle">{t.heroSubtitle}</p>
           </div>
 
           {/* 3D WebGL Canvas Scene */}
@@ -295,7 +337,7 @@ export default function App() {
             />
           )}
 
-          {/* USER INTERACTION POINT A: QUICK SEARCH & SYMPTOM TRIAGE */}
+          {/* USER INTERACTION POINT A: QUICK SEARCH & VOICE ASSISTANT */}
           <div className="triage-search-card" id="interactionPointSearch">
             <div className="dt-touchpoint-marker" data-requirement="user-touchpoint">
               <span className="marker-badge">👉 Touchpoint A: Symptom / Specialty Triage</span>
@@ -309,12 +351,29 @@ export default function App() {
               <input
                 type="text"
                 id="doctorSearchInput"
-                placeholder="Search by doctor name, symptom (e.g. chest pain, knee ache, fever)..."
+                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+
+              {/* VOICE ASSISTANT TRIGGER BUTTON */}
+              <button
+                type="button"
+                className="btn-mic-search"
+                onClick={() => setShowVoiceModal(true)}
+                title="Tap to book using voice / बोलकर बुक करें"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+                <span className="mic-btn-label">AI Voice</span>
+              </button>
+
               {searchQuery && (
                 <button
+                  type="button"
                   className="clear-search-btn"
                   onClick={() => setSearchQuery('')}
                   style={{ display: 'block' }}
@@ -325,17 +384,18 @@ export default function App() {
             </div>
 
             <div className="symptom-chips-row">
-              <span className="chips-label">Quick Triage:</span>
+              <span className="chips-label">{t.quickTriage}</span>
               {[
-                { id: 'all', label: 'All Specialties' },
-                { id: 'Cardiology', label: '❤️ Heart / Chest' },
-                { id: 'Orthopedics', label: '🦴 Joint / Bone' },
-                { id: 'Pediatrics', label: '👶 Child / Pediatric' },
-                { id: 'Neurology', label: '🧠 Neuro / Stroke' },
-                { id: 'Dermatology', label: '🌿 Skin / Allergy' }
+                { id: 'all', label: t.allSpecialties },
+                { id: 'Cardiology', label: t.cardiology },
+                { id: 'Orthopedics', label: t.orthopedics },
+                { id: 'Pediatrics', label: t.pediatrics },
+                { id: 'Neurology', label: t.neurology },
+                { id: 'Dermatology', label: t.dermatology }
               ].map(item => (
                 <button
                   key={item.id}
+                  type="button"
                   className={`symptom-chip ${selectedSpecialty.toLowerCase() === item.id.toLowerCase() ? 'active' : ''}`}
                   onClick={() => setSelectedSpecialty(item.id)}
                 >
@@ -353,16 +413,16 @@ export default function App() {
       <main className="main-content container" id="departments">
         <div className="section-header">
           <div>
-            <h2 className="section-title">Available Doctors &amp; Today&apos;s Real-Time Slots</h2>
-            <p className="section-desc">Showing verified available slots with live queue estimates for today</p>
+            <h2 className="section-title">{t.availableDoctors}</h2>
+            <p className="section-desc">{t.availableSlotsDesc}</p>
           </div>
           <div className="filter-summary">
-            <span>Showing {filteredDoctors.length} Specialist{filteredDoctors.length === 1 ? '' : 's'}</span>
+            <span>{t.showingSpecialists.replace('{count}', filteredDoctors.length).replace('{s}', filteredDoctors.length === 1 ? '' : 's')}</span>
           </div>
         </div>
 
         <div className="doctors-grid">
-          {filteredDoctors.map((doc, idx) => {
+          {filteredDoctors.map((doc) => {
             const isPrimaryTarget = doc.id === 'doc-1';
             const selectedSlot = selectedSlots[doc.id];
 
@@ -411,10 +471,8 @@ export default function App() {
                       <div className="callout-badge">
                         <span className="callout-icon">🎯</span>
                         <div className="callout-text">
-                          <strong className="callout-title">CORE FUNCTION (CIRCLED &amp; LABELLED)</strong>
-                          <p className="callout-desc">
-                            <strong>1-Click Instant Slot-Lock &amp; Live OPD Queue:</strong> Directly eliminates the patient&apos;s primary difficulty (15-min phone queue &amp; 5-page form fatigue) by allowing instant reservation in one tap.
-                          </p>
+                          <strong className="callout-title">{t.coreFunctionTitle}</strong>
+                          <p className="callout-desc">{t.coreFunctionDesc}</p>
                         </div>
                       </div>
                     </div>
@@ -425,9 +483,9 @@ export default function App() {
                     <div className="live-status-bar">
                       <div className="live-pulse-indicator">
                         <span className="pulse-ring"></span>
-                        <strong>Live OPD Queue:</strong> {doc.queueLength} patients ahead in {doc.cabin.split('(')[0]}
+                        <strong>{t.liveOpdQueue}</strong> {t.patientsAhead.replace('{count}', doc.queueLength).replace('{cabin}', doc.cabin.split('(')[0])}
                       </div>
-                      <div className="wait-time-tag">⚡ Avg wait: ~{doc.avgWaitMins} mins</div>
+                      <div className="wait-time-tag">{t.avgWait.replace('{wait}', doc.avgWaitMins)}</div>
                     </div>
 
                     {/* ========================================================
@@ -439,13 +497,13 @@ export default function App() {
                     >
                       {isPrimaryTarget && showAnnotations && (
                         <div className="dt-touchpoint-marker slot-marker" data-requirement="user-touchpoint">
-                          <span className="marker-badge">👉 Touchpoint B: Interactive Slot Touch-Chips (&ge;52px Targets)</span>
+                          <span className="marker-badge">{t.touchpointSlotBadge}</span>
                         </div>
                       )}
 
                       <div className="slot-picker-header">
-                        <span className="slot-picker-label">Select Slot for Consultation:</span>
-                        <span className="slot-guarantee">✓ Guaranteed Doctor Seat</span>
+                        <span className="slot-picker-label">{t.selectSlotLabel}</span>
+                        <span className="slot-guarantee">{t.guaranteedSeat}</span>
                       </div>
 
                       {/* 3D TACTILE SLOTS GRID */}
@@ -453,6 +511,15 @@ export default function App() {
                         {doc.slots.map(s => {
                           const isSelected = selectedSlot && selectedSlot.id === s.id;
                           const isBooked = s.status === 'booked';
+
+                          // Localize slot labels
+                          const slotLabel = s.status === 'fast'
+                            ? t.nextAvailable
+                            : s.status === 'limited'
+                            ? t.onlyOneLeft
+                            : s.status === 'booked'
+                            ? t.booked
+                            : t.available;
 
                           return (
                             <button
@@ -463,7 +530,7 @@ export default function App() {
                               onClick={() => handleSelectSlot(doc.id, s)}
                             >
                               <span className="slot-time">{s.time}</span>
-                              <span className={`slot-badge ${s.status}`}>{s.label}</span>
+                              <span className={`slot-badge ${s.status}`}>{slotLabel}</span>
                             </button>
                           );
                         })}
@@ -473,8 +540,8 @@ export default function App() {
                       <div className="instant-action-row">
                         <div className={`selected-slot-feedback ${selectedSlot ? 'has-selection' : ''}`}>
                           {selectedSlot
-                            ? `Selected: ${selectedSlot.time} with ${doc.name} (${doc.cabin})`
-                            : 'Tap any slot chip above to reserve instantly'}
+                            ? t.selectedSlotFeedback.replace('{time}', selectedSlot.time).replace('{doc}', doc.name).replace('{cabin}', doc.cabin)
+                            : t.tapSlotPrompt}
                         </div>
                         <button
                           type="button"
@@ -482,7 +549,7 @@ export default function App() {
                           disabled={!selectedSlot}
                           onClick={() => handleOpenBooking(doc)}
                         >
-                          <span>Lock Appointment</span>
+                          <span>{t.lockAppointment}</span>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                             <polyline points="12 5 19 12 12 19"></polyline>
@@ -508,6 +575,7 @@ export default function App() {
           slot={bookingTarget.slot}
           onClose={() => setBookingTarget(null)}
           onBookingSuccess={handleBookingSuccess}
+          t={t}
         />
       )}
 
@@ -518,6 +586,7 @@ export default function App() {
         <div className="modal-overlay is-active" role="dialog" aria-modal="true">
           <div className="modal-window token-window">
             <button
+              type="button"
               className="modal-close-btn"
               onClick={() => setBookingConfirmation(null)}
             >
@@ -531,8 +600,8 @@ export default function App() {
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
-                <h3 className="token-title">Appointment Confirmed!</h3>
-                <p className="token-subtitle">Directly synchronized to the doctor&apos;s OPD console.</p>
+                <h3 className="token-title">{t.appointmentConfirmed}</h3>
+                <p className="token-subtitle">{t.syncNote}</p>
               </div>
 
               {/* 3D Interactive Holographic Token Card */}
@@ -540,25 +609,27 @@ export default function App() {
 
               {/* Simulated SMS Alert */}
               <div className="token-sms-preview">
-                <div className="sms-preview-header">📱 Simulated SMS Sent to Patient:</div>
+                <div className="sms-preview-header">{t.simulatedSmsTitle}</div>
                 <p className="sms-preview-text">{bookingConfirmation.simulatedSms}</p>
               </div>
 
               <div className="token-actions">
                 <button
+                  type="button"
                   className="btn-primary-action"
                   onClick={() => setBookingConfirmation(null)}
                 >
-                  Book Another Appointment
+                  {t.bookAnother}
                 </button>
                 <button
+                  type="button"
                   className="btn-secondary-action"
                   onClick={() => {
                     setBookingConfirmation(null);
                     setShowDtCanvas(true);
                   }}
                 >
-                  View Design Thinking Analysis
+                  {t.viewDtAnalysis}
                 </button>
               </div>
             </div>
@@ -567,12 +638,60 @@ export default function App() {
       )}
 
       {/* ========================================================
-           8. DESIGN THINKING CANVAS DRAWER
+           8. EMERGENCY SOS & 3D AMBULANCE DISPATCH MODAL
+           ======================================================== */}
+      <EmergencySosModal
+        isOpen={showEmergencyModal}
+        onClose={() => setShowEmergencyModal(false)}
+        lang={lang}
+        t={t}
+      />
+
+      {/* ========================================================
+           9. AI VOICE BOOKING ASSISTANT MODAL
+           ======================================================== */}
+      <VoiceBookingAssistant
+        isOpen={showVoiceModal}
+        onClose={() => setShowVoiceModal(false)}
+        lang={lang}
+        t={t}
+        onVoiceMatch={handleVoiceMatch}
+      />
+
+      {/* ========================================================
+           10. DESIGN THINKING CANVAS DRAWER
            ======================================================== */}
       <DesignThinkingCanvasModal
         isOpen={showDtCanvas}
         onClose={() => setShowDtCanvas(false)}
       />
+
+      {/* FLOATING ACTION PILLS (QUICK EMERGENCY & QUICK VOICE) */}
+      <div className="floating-action-cluster">
+        <button
+          type="button"
+          className="float-sos-btn"
+          onClick={() => setShowEmergencyModal(true)}
+          title="Emergency 1-Tap SOS"
+        >
+          <span className="siren-pulse-dot"></span>
+          <span>🚨 SOS 108</span>
+        </button>
+
+        <button
+          type="button"
+          className="float-voice-btn"
+          onClick={() => setShowVoiceModal(true)}
+          title="AI Voice Booking Assistant"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+          </svg>
+          <span>Voice</span>
+        </button>
+      </div>
 
     </div>
   );

@@ -1776,3 +1776,620 @@ body .app-root.hide-dt-annotations .interaction-point-wrapper {
   .cube-3d-scene { height: 260px; }
   .three-hero-container { height: 320px; }
 }
+
+
+/* ==========================================================
+   9. NEW FEATURES: LANGUAGE TOGGLE, 3D AMBULANCE, VOICE AI
+   ========================================================== */
+
+/* Language Toggle Button in Header */
+.dt-lang-toggle-btn {
+  background: #1e293b;
+  color: #38bdf8;
+  border: 1.5px solid #38bdf8;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.dt-lang-toggle-btn:hover {
+  background: #38bdf8;
+  color: #0c4a6e;
+  transform: translateY(-1px);
+}
+
+/* Mic Button Inside Search Input */
+.btn-mic-search {
+  position: absolute;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdfa;
+  border: 1.5px solid var(--teal);
+  color: var(--teal-dark);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-mic-search:hover {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+}
+
+.mic-btn-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+/* Floating Action Cluster */
+.floating-action-cluster {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1500;
+}
+
+.float-sos-btn {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  border: 2px solid white;
+  padding: 12px 18px;
+  border-radius: var(--radius-full);
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.45);
+  animation: float-pulse-sos 2s infinite;
+  font-family: inherit;
+}
+
+@keyframes float-pulse-sos {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.float-voice-btn {
+  background: linear-gradient(135deg, #0d9488, #0284c7);
+  color: white;
+  border: 2px solid white;
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+  transition: transform 0.2s;
+  font-family: inherit;
+}
+
+.float-voice-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ==========================================================
+   10. EMERGENCY SOS MODAL & 3D AMBULANCE DISPATCH TRACKER
+   ========================================================== */
+.emergency-overlay {
+  background: rgba(10, 15, 29, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.emergency-window {
+  max-width: 680px;
+  background: #0f172a;
+  color: white;
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.35), 0 20px 40px rgba(0, 0, 0, 0.6);
+  padding: 24px;
+}
+
+.emergency-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.emergency-blinking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #f87171;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.siren-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: siren-dot-blink 0.8s infinite alternate;
+}
+
+@keyframes siren-dot-blink {
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+.emergency-headline {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.emergency-subline {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.emergency-close {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+.emergency-close:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* 3D Ambulance Scene Container */
+.emergency-3d-wrapper {
+  margin: 14px 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.three-ambulance-container {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+.three-ambulance-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.ambulance-telemetry-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.telemetry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #ef4444;
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #f87171;
+}
+
+.flashing-siren-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+  animation: strobe-flash 0.3s infinite alternate;
+}
+
+@keyframes strobe-flash {
+  from { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+  to { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+}
+
+.telemetry-controls {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.btn-view-toggle {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-view-toggle:hover, .btn-view-toggle.active {
+  background: #0284c7;
+  color: white;
+  border-color: #38bdf8;
+}
+
+/* Real-Time Dispatch Telemetry */
+.dispatch-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.telemetry-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.eta-box {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), #1e293b);
+}
+
+.telemetry-lbl {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.telemetry-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin: 2px 0;
+}
+
+.eta-countdown {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: #f87171;
+  letter-spacing: 0.05em;
+}
+
+.telemetry-sub {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+/* Emergency Triage Selector */
+.emergency-triage-section {
+  margin: 16px 0;
+}
+
+.triage-section-lbl {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.emergency-triage-chips {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.emergency-chip {
+  background: #1e293b;
+  border: 1.5px solid #334155;
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.emergency-chip:hover {
+  background: #334155;
+}
+
+.emergency-chip.active {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Emergency Action Buttons */
+.emergency-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.btn-emergency-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-emergency-action.call-108 {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
+.btn-emergency-action.call-108:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.btn-emergency-action.call-er {
+  background: #0d9488;
+  color: white;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
+}
+
+.btn-emergency-action.call-er:hover {
+  background: #0f766e;
+  transform: translateY(-1px);
+}
+
+.btn-siren-toggle {
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-siren-toggle.active {
+  background: #78350f;
+  color: #fde68a;
+  border-color: #f59e0b;
+}
+
+/* ==========================================================
+   11. AI VOICE BOOKING ASSISTANT MODAL
+   ========================================================== */
+.voice-overlay {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.voice-window {
+  max-width: 520px;
+  text-align: center;
+  padding: 32px 28px;
+}
+
+.voice-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ccfbf1;
+  color: #0f766e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.pulse-mic-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0d9488;
+  box-shadow: 0 0 8px #0d9488;
+}
+
+.voice-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--slate-900);
+}
+
+.voice-subtitle {
+  font-size: 0.84rem;
+  color: var(--slate-500);
+  margin-top: 4px;
+}
+
+/* Audio Equalizer & Mic Animation */
+.voice-mic-container {
+  margin: 28px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.voice-wave-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: grid;
+  place-items: center;
+}
+
+.btn-main-mic {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--primary));
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.35);
+  position: relative;
+  z-index: 5;
+  transition: all 0.2s;
+}
+
+.btn-main-mic:hover {
+  transform: scale(1.05);
+}
+
+.btn-main-mic.active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+}
+
+.voice-wave-ring .wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--teal);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.voice-wave-ring.listening .wave-1 {
+  animation: voice-ripple 1.8s infinite;
+}
+
+.voice-wave-ring.listening .wave-2 {
+  animation: voice-ripple 1.8s infinite 0.6s;
+}
+
+.voice-wave-ring.listening .wave-3 {
+  animation: voice-ripple 1.8s infinite 1.2s;
+}
+
+@keyframes voice-ripple {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.voice-status-feedback {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-800);
+  margin-top: 16px;
+}
+
+.voice-transcript-bubble {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  color: var(--slate-700);
+  font-style: italic;
+  margin-top: 8px;
+  max-width: 90%;
+}
+
+/* Sample Voice Prompts */
+.voice-prompts-section {
+  text-align: left;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.prompts-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.prompts-chips-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.voice-prompt-chip {
+  background: white;
+  border: 1px solid var(--slate-200);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.voice-prompt-chip:hover {
+  background: #f0fdfa;
+  border-color: var(--teal);
+  color: var(--teal-dark);
+  transform: translateX(2px);
+}
+
+.prompt-arrow {
+  color: var(--teal);
+  font-weight: 800;
+}

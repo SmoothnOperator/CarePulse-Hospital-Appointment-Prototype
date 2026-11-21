@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { translations } from '../utils/translations.js';
 
 /**
  * FastBookingModal
  * Minimal 2-field form requiring only Name & Phone.
  * Directly removes form fatigue to solve the patient's primary difficulty.
  */
-export default function FastBookingModal({ doctor, slot, onClose, onBookingSuccess }) {
+export default function FastBookingModal({ doctor, slot, onClose, onBookingSuccess, t = translations.en }) {
   const [patientName, setPatientName] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [patientAge, setPatientAge] = useState('');
@@ -74,9 +75,9 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
         <button className="modal-close-btn" onClick={onClose} aria-label="Close dialog">&times;</button>
 
         <div className="modal-header">
-          <div className="modal-pill">Confirm OPD Booking</div>
-          <h3 className="modal-title">Lock Your Appointment Slot</h3>
-          <p className="modal-subtitle">No pre-payment required. Pay at hospital desk after consultation.</p>
+          <div className="modal-pill">{t.confirmOpdBooking || 'Confirm OPD Booking'}</div>
+          <h3 className="modal-title">{t.lockSlotTitle || 'Lock Your Appointment Slot'}</h3>
+          <p className="modal-subtitle">{t.noPrepayNote || 'No pre-payment required. Pay at hospital desk after consultation.'}</p>
         </div>
 
         {/* Appointment summary */}
@@ -95,7 +96,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
         <form className="fast-booking-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="modalPatientName">
-              Patient Full Name <span className="required">*</span>
+              {t.patientName || 'Patient Full Name'} <span className="required">*</span>
             </label>
             <input
               id="modalPatientName"
@@ -111,7 +112,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
           <div className="form-row">
             <div className="form-group flex-2">
               <label htmlFor="modalPatientPhone">
-                Mobile Number (for SMS &amp; Token) <span className="required">*</span>
+                {t.mobileNumber || 'Mobile Number (for SMS & Token)'} <span className="required">*</span>
               </label>
               <input
                 id="modalPatientPhone"
@@ -123,7 +124,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
               />
             </div>
             <div className="form-group flex-1">
-              <label htmlFor="modalPatientAge">Age</label>
+              <label htmlFor="modalPatientAge">{t.age || 'Age'}</label>
               <input
                 id="modalPatientAge"
                 type="number"
@@ -137,7 +138,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
           </div>
 
           <div className="form-group">
-            <label htmlFor="modalReason">Primary Symptom / Reason (Optional)</label>
+            <label htmlFor="modalReason">{t.reason || 'Primary Symptom / Reason (Optional)'}</label>
             <input
               id="modalReason"
               type="text"
@@ -150,7 +151,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
           <div className="trust-notice">
             <div className="trust-icon">🛡️</div>
             <div className="trust-text">
-              <strong>Zero Cancellation Fee:</strong> You will immediately receive a digital token and SMS alert. Present your token directly at {doctor.cabin}.
+              <strong>Zero Cancellation Fee:</strong> {t.zeroFeeNote || 'You will immediately receive a digital token and SMS alert.'} Present your token directly at {doctor.cabin}.
             </div>
           </div>
 
@@ -159,7 +160,7 @@ export default function FastBookingModal({ doctor, slot, onClose, onBookingSucce
             className="btn-submit-booking"
             disabled={isSubmitting}
           >
-            <span>{isSubmitting ? 'Securing Slot...' : 'Confirm & Generate 3D Token'}</span>
+            <span>{isSubmitting ? 'Securing Slot...' : (t.confirmAndGenerate || 'Confirm & Generate 3D Token')}</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
